@@ -2,7 +2,7 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 
 import appCss from "@workspace/ui/globals.css?url"
 
-import { QueryProvider } from "@/integrations/query"
+import { AppProviders } from "@/components/providers"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -21,7 +21,9 @@ export const Route = createRootRoute({
   notFoundComponent: () => (
     <main className="container mx-auto p-4 pt-16">
       <h1 className="text-2xl font-bold">404</h1>
-      <p className="text-muted-foreground">The requested page could not be found.</p>
+      <p className="text-muted-foreground">
+        The requested page could not be found.
+      </p>
     </main>
   ),
   shellComponent: RootDocument,
@@ -38,7 +40,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <AppProviders>{children}</AppProviders>
         <Scripts />
       </body>
     </html>

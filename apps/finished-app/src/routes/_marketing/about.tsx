@@ -30,16 +30,16 @@ function AboutPage() {
       <div className="mt-6 space-y-4 text-lg text-muted-foreground">
         <p>
           Ghost Airlines launched in 2023 to serve the small regional airports
-          larger carriers had quietly abandoned. Our first three routes connected
-          Boston to towns most travelers only knew from folklore — Salem, Sleepy
-          Hollow, and Amityville — at fares that didn&apos;t require a second
-          mortgage.
+          larger carriers had quietly abandoned. Our first three routes
+          connected Boston to towns most travelers only knew from folklore —
+          Salem, Sleepy Hollow, and Amityville — at fares that didn&apos;t
+          require a second mortgage.
         </p>
         <p>
-          Today we fly a fleet of single-class A220s to eight destinations across
-          the U.S. and Europe, still built around the same idea: honest pricing,
-          on-time departures, and a booking experience that doesn&apos;t feel
-          haunted.
+          Today we fly a fleet of single-class A220s to eight destinations
+          across the U.S. and Europe, still built around the same idea: honest
+          pricing, on-time departures, and a booking experience that
+          doesn&apos;t feel haunted.
         </p>
       </div>
 

@@ -18,6 +18,7 @@ import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
 import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
 import { Route as MarketingLoginRouteImport } from './routes/_marketing/login'
 import { Route as MarketingSignupRouteImport } from './routes/_marketing/signup'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AppDashboardIndexRouteImport } from './routes/_app/dashboard/index'
 import { Route as AppDashboardBookRouteImport } from './routes/_app/dashboard/book'
 import { Route as AppDashboardStatusRouteImport } from './routes/_app/dashboard/status'
@@ -65,6 +66,11 @@ const MarketingSignupRoute = MarketingSignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => MarketingRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof MarketingContactRoute
   '/login': typeof MarketingLoginRoute
   '/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/dashboard/book': typeof AppDashboardBookRoute
   '/dashboard/status': typeof AppDashboardStatusRoute
   '/dashboard/': typeof AppDashboardIndexRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/contact': typeof MarketingContactRoute
   '/login': typeof MarketingLoginRoute
   '/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/dashboard/book': typeof AppDashboardBookRoute
   '/dashboard/status': typeof AppDashboardStatusRoute
   '/dashboard': typeof AppDashboardIndexRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_marketing/contact': typeof MarketingContactRoute
   '/_marketing/login': typeof MarketingLoginRoute
   '/_marketing/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/_marketing/': typeof MarketingIndexRoute
   '/_app/dashboard/book': typeof AppDashboardBookRoute
   '/_app/dashboard/status': typeof AppDashboardStatusRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/signup'
+    | '/api/chat'
     | '/dashboard/book'
     | '/dashboard/status'
     | '/dashboard/'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/signup'
+    | '/api/chat'
     | '/dashboard/book'
     | '/dashboard/status'
     | '/dashboard'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/_marketing/contact'
     | '/_marketing/login'
     | '/_marketing/signup'
+    | '/api/chat'
     | '/_marketing/'
     | '/_app/dashboard/book'
     | '/_app/dashboard/status'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   MarketingRoute: typeof MarketingRouteWithChildren
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -228,6 +241,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup'
       preLoaderRoute: typeof MarketingSignupRouteImport
       parentRoute: typeof MarketingRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_app/dashboard/': {
       id: '/_app/dashboard/'
@@ -304,6 +324,7 @@ const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   MarketingRoute: MarketingRouteWithChildren,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

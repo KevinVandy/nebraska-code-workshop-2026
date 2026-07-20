@@ -75,6 +75,8 @@ export interface User {
   email: string
   password: string // fake, plain-text — demo only
   avatar: string
+  phone?: string
+  homeAirport?: string
   memberSince: string // ISO
   tier: 'Silver' | 'Gold' | 'Platinum'
   milesBalance: number

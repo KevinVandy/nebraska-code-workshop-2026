@@ -28,7 +28,8 @@ function ContactPage() {
       <div>
         <h1 className="text-4xl font-bold tracking-tight">Get in touch</h1>
         <p className="mt-3 text-muted-foreground">
-          Questions about a booking, or just want to say boo? We read everything.
+          Questions about a booking, or just want to say boo? We read
+          everything.
         </p>
 
         <form
@@ -62,12 +63,17 @@ function ContactPage() {
           </div>
 
           <form.AppField name="subject">
-            {(field) => <field.TextField label="Subject" placeholder="Booking question" />}
+            {(field) => (
+              <field.TextField label="Subject" placeholder="Booking question" />
+            )}
           </form.AppField>
 
           <form.AppField name="message">
             {(field) => (
-              <field.TextareaField label="Message" placeholder="How can we help?" />
+              <field.TextareaField
+                label="Message"
+                placeholder="How can we help?"
+              />
             )}
           </form.AppField>
 

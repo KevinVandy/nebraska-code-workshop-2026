@@ -2,6 +2,7 @@ import * as React from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createColumnHelper, useTable } from "@tanstack/react-table"
+import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import type { RowSelectionState } from "@tanstack/react-table"
 import type { TripWithFlight } from "@workspace/types"
 import { Button } from "@workspace/ui/components/button"
@@ -21,6 +22,7 @@ import {
 } from "@workspace/ui/components/table"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { useAuth } from "@/components/auth-context"
 import { StatTile } from "@/components/stat-tile"
 import { StatusBadge } from "@/components/status-badge"
 import { TripsChart } from "@/components/trips-chart"
@@ -28,8 +30,8 @@ import type { ChartPoint } from "@/components/trips-chart"
 import {
   allTripsQuery,
   cancelTrip,
+  currentUserQuery,
   upcomingTripsQuery,
-  userQuery,
 } from "@/lib/api"
 import { dashboardDeals } from "@/lib/placeholder"
 import { SortIndicator, dataTableFeatures } from "@/lib/table"
@@ -60,9 +62,10 @@ const columnHelper = createColumnHelper<
 
 function OverviewPage() {
   const queryClient = useQueryClient()
-  const user = useQuery(userQuery)
-  const upcoming = useQuery(upcomingTripsQuery)
-  const allTrips = useQuery(allTripsQuery)
+  const { session } = useAuth()
+  const user = useQuery(currentUserQuery(session?.userId))
+  const upcoming = useQuery(upcomingTripsQuery(session?.userId))
+  const allTrips = useQuery(allTripsQuery(session?.userId))
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
   const cancel = useMutation({
@@ -170,6 +173,9 @@ function OverviewPage() {
     (state) => state
   )
 
+  // Register this table with the unified TanStack Devtools panel.
+  useTanStackTableDevtools(table)
+
   // Aggregate trips-per-month for the chart.
   const chartData: ChartPoint[] = MONTHS.map((month) => ({ month, value: 0 }))
   for (const trip of allTrips.data ?? []) {
@@ -243,9 +249,7 @@ function OverviewPage() {
                 className="flex items-center justify-between rounded-lg bg-muted/40 px-4 py-3 text-sm"
               >
                 <span>{deal.route}</span>
-                <span className="font-semibold text-primary">
-                  ${deal.price}
-                </span>
+                <span className="font-semibold text-brand">${deal.price}</span>
               </div>
             ))}
           </CardContent>

@@ -1,7 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 
+import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 
+import { useAuth } from "@/components/auth-context"
+import { useBooking } from "@/components/booking/booking-dialog"
 import { DealCard } from "@/components/deal-card"
 import { FlightSearchForm } from "@/components/flight-search-form"
 import { Photo } from "@/components/photo"
@@ -13,6 +16,9 @@ export const Route = createFileRoute("/_marketing/")({
 })
 
 function HomePage() {
+  const { session } = useAuth()
+  const { openBooking } = useBooking()
+
   return (
     <div className="container mx-auto px-4">
       {/* Hero */}
@@ -21,8 +27,8 @@ function HomePage() {
           Low fares to the places everyone&apos;s talking about.
         </h1>
         <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-          Real routes, real prices, zero hidden fees. Ghost Airlines flies you to
-          the country&apos;s most talked-about small towns — book in minutes.
+          Real routes, real prices, zero hidden fees. Ghost Airlines flies you
+          to the country&apos;s most talked-about small towns — book in minutes.
         </p>
         <Card className="mt-10 p-6">
           <FlightSearchForm />
@@ -32,7 +38,9 @@ function HomePage() {
       {/* Featured deals */}
       <section className="py-8">
         <h2 className="text-2xl font-bold">Featured deals</h2>
-        <p className="mt-1 text-muted-foreground">Fares this good tend to disappear.</p>
+        <p className="mt-1 text-muted-foreground">
+          Fares this good tend to disappear.
+        </p>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {featuredDeals.map((deal) => (
             <DealCard key={deal.route} {...deal} />
@@ -62,10 +70,37 @@ function HomePage() {
                 alt={`${dest.city}, ${dest.region}`}
                 className="h-24 border-b"
               />
-              <div className="space-y-0.5 p-4">
+              <div className="space-y-1 p-4">
                 <p className="font-semibold">{dest.city}</p>
                 <p className="text-sm text-muted-foreground">{dest.region}</p>
-                <p className="text-sm font-medium text-primary">from ${dest.price}</p>
+                <p className="text-sm font-medium text-brand">
+                  from ${dest.price}
+                </p>
+                {session ? (
+                  <Button
+                    size="sm"
+                    className="mt-1 w-full"
+                    onClick={() =>
+                      openBooking({
+                        kind: "route",
+                        destination: dest.code,
+                        label: dest.city,
+                      })
+                    }
+                  >
+                    Book
+                  </Button>
+                ) : (
+                  <Link
+                    to="/signup"
+                    className={buttonVariants({
+                      size: "sm",
+                      className: "mt-1 w-full",
+                    })}
+                  >
+                    Sign up to get this deal
+                  </Link>
+                )}
               </div>
             </Card>
           ))}

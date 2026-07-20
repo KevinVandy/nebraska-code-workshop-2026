@@ -2,6 +2,30 @@ import { useEffect, useState } from "react"
 import { MDXProvider } from "@mdx-js/react"
 import { useHotkey } from "@tanstack/react-hotkeys"
 import { slides } from "./slides"
+import {
+  Columns,
+  DevObsessed,
+  GradientText,
+  Kicker,
+  LibraryTitleSlide,
+  Note,
+  SectionSlide,
+  TheStack,
+  TitleSlide,
+} from "./components/layouts"
+
+// Available in every .mdx slide without an import
+const mdxComponents = {
+  Columns,
+  DevObsessed,
+  GradientText,
+  Kicker,
+  LibraryTitleSlide,
+  Note,
+  SectionSlide,
+  TheStack,
+  TitleSlide,
+}
 
 function slideFromHash(): number {
   const n = Number.parseInt(window.location.hash.slice(1), 10)
@@ -43,7 +67,7 @@ export function App() {
   return (
     <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100">
       <main className="slide flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-[8vw] py-[6vh]">
-        <MDXProvider>
+        <MDXProvider components={mdxComponents}>
           <Slide />
         </MDXProvider>
       </main>

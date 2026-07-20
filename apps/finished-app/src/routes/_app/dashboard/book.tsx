@@ -6,19 +6,33 @@ import {
   useQuery,
 } from "@tanstack/react-query"
 import { createColumnHelper, useTable } from "@tanstack/react-table"
+import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import type { OnChangeFn, SortingState } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
+import { useDebouncedCallback } from "@tanstack/react-pacer"
+import { z } from "zod"
 import type { Flight } from "@workspace/types"
 import { Button } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { cn } from "@workspace/ui/lib/utils"
+import { useBooking } from "@/components/booking/booking-dialog"
 import { FLIGHTS_PAGE_SIZE, airportsQuery, fetchFlightsPage } from "@/lib/api"
 import type { FlightsPage } from "@/lib/api"
 import { SortIndicator, dataTableFeatures } from "@/lib/table"
 
+// Filters live in the URL, so they're shareable/bookmarkable — and Casper's
+// applySearchFilters client tool can navigate here with typed values.
+const bookSearchSchema = z.object({
+  from: z.string().optional(),
+  to: z.string().optional(),
+  date: z.string().optional(),
+  q: z.string().optional(),
+})
+
 export const Route = createFileRoute("/_app/dashboard/book")({
+  validateSearch: bookSearchSchema,
   component: BookPage,
 })
 
@@ -43,6 +57,38 @@ const columnHelper = createColumnHelper<typeof dataTableFeatures, Flight>()
 function BookPage() {
   const airports = useQuery(airportsQuery)
   const airportOptions = airports.data ?? []
+
+  const filters = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  // Merge one filter into the URL (undefined removes the key).
+  const setFilter = (key: "from" | "to" | "date" | "q", value: string) => {
+    navigate({
+      search: (prev) => ({ ...prev, [key]: value || undefined }),
+      replace: true,
+    })
+  }
+
+  /* TanStack Pacer: the search box keeps its own local state so typing stays
+   * instant, while the expensive part — writing to the URL, which changes the
+   * query key and refetches — is debounced to 400ms. Without this, every
+   * keystroke triggered a navigation and an API request. */
+  const [searchText, setSearchText] = React.useState(filters.q ?? "")
+  const commitSearch = useDebouncedCallback(
+    (value: string) => setFilter("q", value),
+    { wait: 400 },
+  )
+
+  // Keep the input in sync when the URL changes from elsewhere (e.g. Casper's
+  // applySearchFilters tool, or the back button).
+  React.useEffect(() => {
+    setSearchText(filters.q ?? "")
+  }, [filters.q])
+
+  // Columns are static, so the Book cell reads the latest opener via a ref.
+  const { openBooking } = useBooking()
+  const openBookingRef = React.useRef(openBooking)
+  openBookingRef.current = openBooking
 
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -78,8 +124,14 @@ function BookPage() {
           id: "book",
           header: "",
           size: 110,
-          cell: () => (
-            <Button size="sm" className="ml-auto">
+          cell: ({ row }) => (
+            <Button
+              size="sm"
+              className="ml-auto"
+              onClick={() =>
+                openBookingRef.current({ kind: "flight", flight: row.original })
+              }
+            >
               Book
             </Button>
           ),
@@ -90,9 +142,9 @@ function BookPage() {
 
   const { data, fetchNextPage, isFetching, isLoading, hasNextPage } =
     useInfiniteQuery<FlightsPage>({
-      queryKey: ["flights", "infinite", sorting],
+      queryKey: ["flights", "infinite", sorting, filters],
       queryFn: ({ pageParam }) =>
-        fetchFlightsPage(pageParam as number, sorting),
+        fetchFlightsPage(pageParam as number, sorting, filters),
       initialPageParam: 0,
       getNextPageParam: (lastPage, pages) => {
         const loaded = pages.length * FLIGHTS_PAGE_SIZE
@@ -136,6 +188,9 @@ function BookPage() {
     (state) => state
   )
 
+  // Register this table with the unified TanStack Devtools panel.
+  useTanStackTableDevtools(table)
+
   const { rows } = table.getRowModel()
 
   const rowVirtualizer = useVirtualizer({
@@ -171,7 +226,12 @@ function BookPage() {
         <div className="grid gap-4 md:grid-cols-[1fr_1fr_1fr_2fr_auto] md:items-end">
           <div className="grid gap-1.5">
             <Label htmlFor="from">From</Label>
-            <select id="from" className={selectClass} defaultValue="">
+            <select
+              id="from"
+              className={selectClass}
+              value={filters.from ?? ""}
+              onChange={(e) => setFilter("from", e.target.value)}
+            >
               <option value="">Any</option>
               {airportOptions.map((a) => (
                 <option key={a.code} value={a.code}>
@@ -182,7 +242,12 @@ function BookPage() {
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="to">To</Label>
-            <select id="to" className={selectClass} defaultValue="">
+            <select
+              id="to"
+              className={selectClass}
+              value={filters.to ?? ""}
+              onChange={(e) => setFilter("to", e.target.value)}
+            >
               <option value="">Any</option>
               {airportOptions.map((a) => (
                 <option key={a.code} value={a.code}>
@@ -193,11 +258,25 @@ function BookPage() {
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="date">Date</Label>
-            <input id="date" type="date" className={selectClass} />
+            <input
+              id="date"
+              type="date"
+              className={selectClass}
+              value={filters.date ?? ""}
+              onChange={(e) => setFilter("date", e.target.value)}
+            />
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="search">Search</Label>
-            <Input id="search" placeholder="Flight #, city, or airport code" />
+            <Input
+              id="search"
+              placeholder="Flight #, city, or airport code"
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value) // instant
+                commitSearch(e.target.value) // debounced
+              }}
+            />
           </div>
           <p className="pb-2 text-sm whitespace-nowrap text-muted-foreground">
             {totalRowCount ? `${totalRowCount} flights found` : "…"}

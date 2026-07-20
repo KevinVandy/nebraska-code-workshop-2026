@@ -18,7 +18,10 @@ export function Photo({
 }) {
   return (
     <div
-      className={cn("overflow-hidden bg-muted/40 text-muted-foreground", className)}
+      className={cn(
+        "overflow-hidden bg-muted/40 text-muted-foreground",
+        className
+      )}
       style={hatchStyle}
     >
       <img

@@ -5,7 +5,7 @@ export function errorText(errors: Array<unknown>): string {
     .map((err) =>
       typeof err === "string"
         ? err
-        : ((err as { message?: string } | null)?.message ?? ""),
+        : ((err as { message?: string } | null)?.message ?? "")
     )
     .filter(Boolean)
     .join(", ")

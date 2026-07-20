@@ -2,6 +2,7 @@ import * as React from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { createColumnHelper, useTable } from "@tanstack/react-table"
+import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import { RefreshCw } from "lucide-react"
 
 import type { Flight, FlightStatus as FlightStatusType } from "@workspace/types"
@@ -33,7 +34,10 @@ const statusLabels: Record<FlightStatusType, string> = {
 }
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  })
 }
 
 // The airport city name is joined into the row data (rather than looked up
@@ -49,7 +53,10 @@ const columns = columnHelper.columns([
     size: 120,
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
-  columnHelper.accessor("destinationLabel", { header: "Destination", size: 240 }),
+  columnHelper.accessor("destinationLabel", {
+    header: "Destination",
+    size: 240,
+  }),
   columnHelper.accessor("gate", { header: "Gate", size: 100 }),
   columnHelper.accessor("departTime", {
     id: "scheduled",
@@ -69,7 +76,9 @@ function StatusPage() {
   const airports = useQuery(airportsQuery)
 
   const rows = React.useMemo<StatusRow[]>(() => {
-    const cityByCode = new Map((airports.data ?? []).map((a) => [a.code, a.city]))
+    const cityByCode = new Map(
+      (airports.data ?? []).map((a) => [a.code, a.city])
+    )
     return (flights.data ?? []).map((f) => ({
       ...f,
       destinationLabel: `${cityByCode.get(f.destinationCode) ?? f.destinationCode} (${f.destinationCode})`,
@@ -83,8 +92,11 @@ function StatusPage() {
       columns,
       getRowId: (row) => String(row.id),
     },
-    (state) => state,
+    (state) => state
   )
+
+  // Register this table with the unified TanStack Devtools panel.
+  useTanStackTableDevtools(table)
 
   const updated = flights.dataUpdatedAt
     ? new Date(flights.dataUpdatedAt).toLocaleTimeString([], {
@@ -111,7 +123,9 @@ function StatusPage() {
           onClick={() => flights.refetch()}
           disabled={flights.isFetching}
         >
-          <RefreshCw className={flights.isFetching ? "animate-spin" : undefined} />
+          <RefreshCw
+            className={flights.isFetching ? "animate-spin" : undefined}
+          />
           Refresh
         </Button>
       </div>
@@ -133,7 +147,8 @@ function StatusPage() {
                         type="button"
                         className={cn(
                           "flex items-center gap-1 whitespace-nowrap",
-                          canSort && "cursor-pointer select-none hover:text-foreground",
+                          canSort &&
+                            "cursor-pointer select-none hover:text-foreground"
                         )}
                         onClick={header.column.getToggleSortingHandler()}
                         disabled={!canSort}
@@ -150,14 +165,21 @@ function StatusPage() {
           <TableBody>
             {flights.isPending ? (
               <TableRow>
-                <TableCell colSpan={columnCount} className="py-8 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={columnCount}
+                  className="py-8 text-center text-muted-foreground"
+                >
                   Loading flights…
                 </TableCell>
               </TableRow>
             ) : flights.isError ? (
               <TableRow>
-                <TableCell colSpan={columnCount} className="py-8 text-center text-destructive">
-                  Couldn&apos;t load the status board. Is the API running on :3300?
+                <TableCell
+                  colSpan={columnCount}
+                  className="py-8 text-center text-destructive"
+                >
+                  Couldn&apos;t load the status board. Is the API running on
+                  :3300?
                 </TableCell>
               </TableRow>
             ) : (

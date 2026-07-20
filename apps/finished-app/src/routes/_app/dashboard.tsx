@@ -6,6 +6,12 @@ const tabs = [
   { to: "/dashboard/status", label: "Flight Status", exact: false },
 ] as const
 
+// Active styling comes from the router's data-status attribute rather than
+// `activeProps`, so the active colours reliably override the base ones instead
+// of relying on Tailwind's CSS source order.
+const tabClass =
+  "-mb-px border-b-2 border-transparent py-4 text-sm text-muted-foreground transition-colors hover:text-foreground data-[status=active]:border-primary data-[status=active]:font-medium data-[status=active]:text-foreground"
+
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardLayout,
 })
@@ -19,8 +25,7 @@ function DashboardLayout() {
             key={tab.to}
             to={tab.to}
             activeOptions={{ exact: tab.exact }}
-            className="-mb-px border-b-2 border-transparent py-4 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            activeProps={{ className: "border-primary text-foreground font-medium" }}
+            className={tabClass}
           >
             {tab.label}
           </Link>

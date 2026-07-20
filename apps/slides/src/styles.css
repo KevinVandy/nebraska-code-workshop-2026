@@ -1,32 +1,122 @@
 @import "tailwindcss";
 @import "highlight.js/styles/github-dark.css";
 
+/* Animated color-cycling text, ported from the tanstack.com homepage
+   ("open-source" in the hero). Gradient is far wider than the text and
+   slides back and forth, so the letters continuously shift hue. */
+@keyframes gradient-text-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-text {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  color: rgb(20 184 166);
+  background-image: linear-gradient(
+    90deg,
+    rgb(20 184 166),
+    rgb(59 130 246),
+    rgb(168 85 247),
+    rgb(244 63 94),
+    rgb(234 179 8),
+    rgb(20 184 166)
+  );
+  background-size: 720% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text-shift 34s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient-text {
+    animation: none;
+  }
+}
+
+/* Layout-component typography — kept here so every size scales together */
+.slide-kicker {
+  font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+}
+
+.slide-tagline {
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  line-height: 1.15;
+}
+
+.slide-speaker-name {
+  font-size: clamp(2.25rem, 3.6vw, 2.8rem);
+}
+
+.slide-speaker-title {
+  font-size: clamp(1.7rem, 2.6vw, 1.9rem);
+}
+
+/* "TANSTACK" pill on a library title slide — sized against the library
+   name beside it, not the default root font size. */
+.library-badge {
+  font-size: clamp(1.2rem, 2.6vw, 2.2rem);
+}
+
 /* Slide typography — MDX renders plain elements, styled here */
 .slide h1 {
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-size: clamp(3.75rem, 9vw, 7.5rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.05;
   margin-bottom: 0.5em;
 }
 
+/* Content-slide headings get an orange accent bar in the left gutter */
 .slide h2 {
-  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  position: relative;
+  font-size: clamp(3rem, 6.75vw, 5.25rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.1;
   margin-bottom: 0.75em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--color-zinc-800);
+}
+
+.slide h2::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 4rem;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-orange-500);
+}
+
+/* Full-bleed layouts (title/section) bring their own heading treatment */
+.slide .full-bleed :where(h1, h2) {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.slide .full-bleed :where(h1, h2)::after {
+  display: none;
 }
 
 .slide h3 {
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: clamp(2.25rem, 4.5vw, 3.375rem);
   font-weight: 600;
   margin-bottom: 0.75em;
 }
 
 .slide p,
 .slide li {
-  font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+  font-size: clamp(1.688rem, 3.3vw, 2.625rem);
   line-height: 1.5;
   color: var(--color-zinc-300);
 }
@@ -89,7 +179,7 @@
 }
 
 .slide pre code {
-  font-size: clamp(0.9rem, 1.6vw, 1.25rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.875rem);
   line-height: 1.6;
   background: transparent;
 }

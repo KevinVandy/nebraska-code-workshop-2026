@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router"
 import { z } from "zod"
 
@@ -5,8 +6,10 @@ import { Button } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 import { Separator } from "@workspace/ui/components/separator"
 
+import { useAuth } from "@/components/auth-context"
 import { useAppForm } from "@/components/form"
 import { isEmailTaken } from "@/lib/api"
+import { registerUser } from "@/lib/auth"
 import { signupSchema } from "@/lib/schemas"
 
 export const Route = createFileRoute("/_marketing/signup")({
@@ -15,14 +18,25 @@ export const Route = createFileRoute("/_marketing/signup")({
 
 function SignupPage() {
   const navigate = useNavigate()
+  const { signIn } = useAuth()
+  const [formError, setFormError] = React.useState<string | null>(null)
 
   const form = useAppForm({
     defaultValues: { name: "", email: "", password: "" },
     validators: { onChange: signupSchema },
-    onSubmit: async () => {
-      // Fake auth for the demo: pretend to create the account, then continue.
-      await new Promise((resolve) => setTimeout(resolve, 600))
-      navigate({ to: "/dashboard" })
+    onSubmit: async ({ value }) => {
+      setFormError(null)
+      try {
+        /* FAKE AUTH: really does create a user row in db.json — with a
+         * plain-text password, which no real app should ever do. */
+        const user = await registerUser(value)
+        signIn(user)
+        navigate({ to: "/dashboard" })
+      } catch {
+        setFormError(
+          "Couldn't create your account. Is the API running on :3300?"
+        )
+      }
     },
   })
 
@@ -88,6 +102,10 @@ function SignupPage() {
             )}
           </form.AppField>
 
+          {formError ? (
+            <p className="text-sm text-destructive">{formError}</p>
+          ) : null}
+
           <form.AppForm>
             <form.SubmitButton
               label="Create account"
@@ -110,7 +128,7 @@ function SignupPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-primary hover:underline">
+          <Link to="/login" className="font-medium text-brand hover:underline">
             Log in
           </Link>
         </p>

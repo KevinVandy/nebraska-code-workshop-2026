@@ -14,9 +14,16 @@ export function SubmitButton({
   const form = useFormContext()
 
   return (
-    <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting] as const}>
+    <form.Subscribe
+      selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+    >
       {([canSubmit, isSubmitting]) => (
-        <Button type="submit" size="lg" className={className} disabled={!canSubmit}>
+        <Button
+          type="submit"
+          size="lg"
+          className={className}
+          disabled={!canSubmit}
+        >
           {isSubmitting ? (pendingLabel ?? "Submitting…") : label}
         </Button>
       )}
