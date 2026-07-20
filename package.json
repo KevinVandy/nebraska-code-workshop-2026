@@ -1,0 +1,23 @@
+{
+  "name": "@tanstack/workshop",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "typecheck": "turbo run typecheck",
+    "seed": "node apps/api/scripts/generate-fake-data.js"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "turbo": "^2.9.18",
+    "typescript": "^6"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

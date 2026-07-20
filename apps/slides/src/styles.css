@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@import "highlight.js/styles/github-dark.css";
+
+/* Slide typography — MDX renders plain elements, styled here */
+.slide h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin-bottom: 0.5em;
+}
+
+.slide h2 {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 0.75em;
+}
+
+.slide h3 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  margin-bottom: 0.75em;
+}
+
+.slide p,
+.slide li {
+  font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+  line-height: 1.5;
+  color: var(--color-zinc-300);
+}
+
+.slide p + p {
+  margin-top: 0.75em;
+}
+
+.slide ul,
+.slide ol {
+  margin-top: 0.5em;
+  padding-left: 1.25em;
+}
+
+.slide ul {
+  list-style: disc;
+}
+
+.slide ol {
+  list-style: decimal;
+}
+
+.slide li + li {
+  margin-top: 0.4em;
+}
+
+.slide li::marker {
+  color: var(--color-orange-500);
+}
+
+.slide strong {
+  color: var(--color-zinc-50);
+  font-weight: 700;
+}
+
+.slide a {
+  color: var(--color-orange-400);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.slide code {
+  font-size: 0.9em;
+}
+
+.slide :not(pre) > code {
+  background: var(--color-zinc-800);
+  border-radius: 0.3em;
+  padding: 0.1em 0.35em;
+  color: var(--color-orange-300);
+}
+
+.slide pre {
+  margin-top: 1em;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-zinc-800);
+  background: var(--color-zinc-900);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+}
+
+.slide pre code {
+  font-size: clamp(0.9rem, 1.6vw, 1.25rem);
+  line-height: 1.6;
+  background: transparent;
+}
+
+.slide blockquote {
+  margin-top: 1em;
+  border-left: 4px solid var(--color-orange-500);
+  padding-left: 1em;
+  font-style: italic;
+  color: var(--color-zinc-400);
+}

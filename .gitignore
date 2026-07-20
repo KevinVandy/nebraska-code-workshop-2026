@@ -1,0 +1,76 @@
+# Generated agent skill sync targets.
+# Source-of-truth skills live in .agents/skills and should be tracked.
+.claude/
+.codex/
+.cursor/
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.cjs
+.pnp.loader.mjs
+
+# Package manager state
+.pnpm-store/
+.yarn/
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/sdks/
+!.yarn/versions/
+
+# Build output
+dist/
+build/
+out/
+lib/
+coverage/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.vercel/
+.netlify/
+.wrangler/
+
+# Turborepo and framework caches
+.turbo/
+.cache/
+.parcel-cache/
+.vite/
+.vitest/
+.eslintcache
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
