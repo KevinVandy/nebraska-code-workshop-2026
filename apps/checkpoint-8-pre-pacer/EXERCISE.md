@@ -9,7 +9,7 @@ with TanStack Pacer.
 
 ```bash
 pnpm dev:server                           # json-server on :3300 (repo root)
-pnpm --filter checkpoint-8-pre-pacer dev    # this app on :5557
+pnpm --filter checkpoint-8-pre-pacer dev    # this app on :5558
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).

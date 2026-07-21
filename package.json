@@ -3,15 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
     "dev": "turbo run dev",
-    "dev:finished": "turbo run dev --filter=finished-app",
-    "dev:slides": "turbo run dev --filter=slides",
     "dev:server": "turbo run dev --filter=api",
-    "lint": "turbo run lint",
-    "format": "turbo run format",
-    "typecheck": "turbo run typecheck",
-    "seed": "node apps/api/scripts/generate-fake-data.js",
     "dev:1": "turbo run dev --filter=checkpoint-1-pre-dashboard",
     "dev:2": "turbo run dev --filter=checkpoint-2-pre-query",
     "dev:3": "turbo run dev --filter=checkpoint-3-pre-query-prefetching",
@@ -21,7 +14,14 @@
     "dev:7": "turbo run dev --filter=checkpoint-7-pre-form",
     "dev:8": "turbo run dev --filter=checkpoint-8-pre-pacer",
     "dev:9": "turbo run dev --filter=checkpoint-9-pre-hotkeys",
-    "dev:10": "turbo run dev --filter=checkpoint-10-pre-ai"
+    "dev:10": "turbo run dev --filter=checkpoint-10-pre-ai",
+    "dev:finished": "turbo run dev --filter=finished-app",
+    "dev:slides": "turbo run dev --filter=slides",
+    "seed": "node apps/api/scripts/generate-fake-data.js",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "prettier": "^3.8.3",

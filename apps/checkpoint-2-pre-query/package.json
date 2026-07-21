@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "vite dev --port 5555",
+    "dev": "vite dev --port 5552",
     "build": "vite build",
-    "preview": "vite preview --port 5555",
+    "preview": "vite preview --port 5552",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"

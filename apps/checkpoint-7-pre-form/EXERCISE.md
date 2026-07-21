@@ -9,7 +9,7 @@ Form and zod.
 
 ```bash
 pnpm dev:server                          # json-server on :3300 (repo root)
-pnpm --filter checkpoint-7-pre-form dev    # this app on :5556
+pnpm --filter checkpoint-7-pre-form dev    # this app on :5557
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
@@ -50,7 +50,7 @@ imports. Follow the same style rather than extracting shared helpers.
 - **Watch the submit button.** `form.Subscribe` on `canSubmit` disables it
   while the form is invalid or in flight, without re-rendering the whole form
   on every keystroke.
-- **Confirm your message landed:** `curl http://localhost:3300/messages`
+- **Confirm your message landed:** `curl http://localhost:5557/messages`
 - **Open the devtools panel → Form tab** and watch field state as you type.
 - **Compare submit-error handling:** contact uses the mutation's `isError`;
   login and signup use plain `useState`. Neither is more correct — but know

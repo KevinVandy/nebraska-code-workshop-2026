@@ -11,7 +11,7 @@ fully built out. Here you're only creating the route structure.
 
 ```bash
 pnpm dev:server                                # json-server on :3300
-pnpm --filter checkpoint-1-pre-dashboard dev   # this app on :5555
+pnpm --filter checkpoint-1-pre-dashboard dev   # this app on :5551
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`). You'll

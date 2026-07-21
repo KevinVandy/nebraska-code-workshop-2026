@@ -9,7 +9,7 @@ buttons. Replace that with an infinite, virtualized scroll.
 
 ```bash
 pnpm dev:server                             # json-server on :3300 (repo root)
-pnpm --filter checkpoint-6-pre-virtual dev    # this app on :5545
+pnpm --filter checkpoint-6-pre-virtual dev    # this app on :5556
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`), then go

@@ -11,7 +11,7 @@ rendering mode per route.
 
 ```bash
 pnpm dev:server                            # json-server on :3300 (repo root)
-pnpm --filter checkpoint-4-pre-start dev     # this app on :5555
+pnpm --filter checkpoint-4-pre-start dev     # this app on :5554
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
@@ -19,7 +19,7 @@ Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
 ## See what you're fixing
 
 ```bash
-curl -s http://localhost:5555/ | grep -c "Low fares"
+curl -s http://localhost:5554/ | grep -c "Low fares"
 ```
 
 Zero. View source on the home page and you'll find an empty `<div id="root">`.
@@ -107,8 +107,8 @@ pnpm build
 The prerender log should list exactly two pages. Then:
 
 ```bash
-curl -s http://localhost:5555/ | grep -c "Low fares"          # now ≥ 1
-curl -s http://localhost:5555/dashboard | grep -c "Trips over time"   # still 0
+curl -s http://localhost:5554/ | grep -c "Low fares"          # now ≥ 1
+curl -s http://localhost:5554/dashboard | grep -c "Trips over time"   # still 0
 ```
 
 The home page ships real HTML; the dashboard ships none. That's the whole

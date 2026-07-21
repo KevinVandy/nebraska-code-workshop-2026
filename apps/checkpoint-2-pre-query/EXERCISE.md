@@ -10,7 +10,7 @@ first.
 
 ```bash
 pnpm dev:server                          # json-server on :3300 (repo root)
-pnpm --filter checkpoint-2-pre-query dev   # this app on :5555
+pnpm --filter checkpoint-2-pre-query dev   # this app on :5552
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).

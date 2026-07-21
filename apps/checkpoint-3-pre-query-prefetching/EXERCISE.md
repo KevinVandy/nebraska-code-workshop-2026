@@ -9,7 +9,7 @@ instant by fetching before the click.
 
 ```bash
 pnpm dev:server                                    # json-server on :3300
-pnpm --filter checkpoint-3-pre-query-prefetching dev # this app on :5555
+pnpm --filter checkpoint-3-pre-query-prefetching dev # this app on :5553
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`), then go

@@ -10,7 +10,7 @@ job is to wire him up.
 ```bash
 cp .env.example .env       # then add your OPENAI_API_KEY
 pnpm dev:server            # json-server on :3300 (from the repo root)
-pnpm --filter checkpoint-10-pre-ai dev    # this app on :5559
+pnpm --filter checkpoint-10-pre-ai dev    # this app on :5560
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`), then
