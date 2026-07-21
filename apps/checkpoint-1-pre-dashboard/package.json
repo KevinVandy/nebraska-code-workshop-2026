@@ -1,0 +1,46 @@
+{
+  "name": "checkpoint-1-pre-dashboard",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev --port 5555",
+    "build": "vite build",
+    "preview": "vite preview --port 5555",
+    "lint": "eslint",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4",
+    "@tanstack/react-devtools": "latest",
+    "@tanstack/react-form": "^1.33.2",
+    "@tanstack/react-query": "^5.101.2",
+    "@tanstack/react-query-devtools": "^5.101.2",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-table": "9.0.0-beta.55",
+    "@tanstack/router-plugin": "latest",
+    "@workspace/types": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "lucide-react": "^1.25.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "recharts": "^3.10.0",
+    "tailwindcss": "^4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tanstack/devtools-vite": "latest",
+    "@tanstack/eslint-config": "latest",
+    "@tanstack/react-form-devtools": "^0.2.31",
+    "@tanstack/react-table-devtools": "9.0.0-beta.55",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6",
+    "eslint": "^9",
+    "typescript": "^6",
+    "vite": "^8"
+  }
+}

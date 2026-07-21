@@ -185,6 +185,23 @@ function generateTrips(flights) {
   return trips
 }
 
+/**
+ * MUST match portraitUrl() in apps/finished-app/src/lib/images.ts (same FNV-1a
+ * hash, same folder/index picks). The app's UI falls back to portraitUrl(name)
+ * while the user query is loading — seeding the identical URL means the avatar
+ * never visibly swaps once the query resolves.
+ */
+function portraitUrl(seed) {
+  let h = 2166136261
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  h = Math.abs(h)
+  const folder = ((h >>> 16) & 1) === 0 ? 'female' : 'male'
+  return `https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/${folder}/512/${h % 100}.jpg`
+}
+
 function generateUsers() {
   const demo = {
     id: 1,
@@ -193,7 +210,7 @@ function generateUsers() {
     password: 'Test1234',
     phone: '555-867-5309',
     homeAirport: 'SLM',
-    avatar: faker.image.avatar(),
+    avatar: portraitUrl('John Doe'),
     memberSince: addMinutes(now, -faker.number.int({ min: 400, max: 1200 }) * DAY).toISOString(),
     tier: 'Gold',
     milesBalance: faker.number.int({ min: 10000, max: 90000 }),
@@ -202,12 +219,13 @@ function generateUsers() {
   }
   const others = []
   for (let i = 2; i <= 3; i++) {
+    const name = faker.person.fullName()
     others.push({
       id: i,
-      name: faker.person.fullName(),
+      name,
       email: faker.internet.email().toLowerCase(),
       password: 'password',
-      avatar: faker.image.avatar(),
+      avatar: portraitUrl(name),
       memberSince: addMinutes(now, -faker.number.int({ min: 100, max: 1500 }) * DAY).toISOString(),
       tier: faker.helpers.arrayElement(['Silver', 'Gold', 'Platinum']),
       milesBalance: faker.number.int({ min: 0, max: 120000 }),
