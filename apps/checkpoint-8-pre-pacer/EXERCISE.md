@@ -35,9 +35,18 @@ The shape both share: **keep the cheap thing instant, debounce the expensive
 thing.** Local state updates on every keystroke so the input never feels laggy;
 only the part that triggers a network request gets debounced.
 
-Exercise 1 has a second half worth doing carefully — once the input owns its
-own state, external writers of `?q=` (the back button, the palette) can no
-longer update it, and the naive fix eats keystrokes. The TODO walks through it.
+**Exercise 1, step by step:**
+
+1. Local state so typing stays instant:
+   `const [searchText, setSearchText] = useState(filters.q ?? "")`
+2. Debounce only the expensive part:
+   `const commitSearch = useDebouncedCallback((v) => setFilter("q", v), { wait: 400 })`
+3. The input's `onChange` calls **both** — `setSearchText` (instant) and
+   `commitSearch` (debounced).
+4. Now the second half: `?q=` can also change from *outside* the input (back
+   button, the palette). Sync `searchText` from `filters.q` in an effect — but
+   **skip the sync while the input is focused**, or it clobbers keystrokes that
+   landed during the 400ms gap. Try it without the guard first and type fast.
 
 ## Two hooks, two jobs
 

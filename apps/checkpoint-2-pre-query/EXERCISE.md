@@ -48,8 +48,30 @@ app. Suggested order:
 |---|-------|------|
 | 1 | `dashboard/status.tsx` | Two `useQuery` calls; delete the effects, the interval, and the refetch counter |
 | 2 | `lib/api.ts` | Wrap the fetch functions in `queryOptions`, give airports `staleTime: Infinity` |
-| 3 | everywhere else | The other seven components |
+| 3 | everywhere else | The other seven components (list below) |
 | 4 | `providers.tsx`, `devtools.tsx`, `auth-context.tsx` | Provider, devtools panel, cache clear on sign-out |
+
+**The full list for step 3:**
+
+| File | What it fetches |
+|------|-----------------|
+| `components/site-header.tsx` | the signed-in user |
+| `routes/_app/profile.tsx` | user + the save mutation |
+| `routes/_app/dashboard/index.tsx` | 4 fetches + the cancel mutation |
+| `routes/_app/dashboard/book.tsx` | airports, flights page, price history |
+| `components/booking/booking-dialog.tsx` | cheapest flight + the book mutation |
+| `components/deal-card.tsx` | per-card fare lookup |
+| `components/shortcuts/command-palette.tsx` | live search |
+| `components/flight-search-form.tsx` | airports |
+
+For the mutations, pair `useMutation` with invalidation:
+
+```ts
+const cancel = useMutation({
+  mutationFn: cancelTrip,
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["trips"] }),
+})
+```
 
 You don't have to convert all eight components to move on — do the status
 board, the overview (including the cancel mutation), and one more. The next

@@ -44,51 +44,14 @@ function priceHistoryQuery(from?: string, to?: string) {
   })
 }
 
-/* ============================================================================
- * EXERCISE 3 of 3 — TanStack Table: server-side sorting
- * ============================================================================
+/* EXERCISE 3 of 3 — server-side sorting (details in EXERCISE.md).
  *
- * The last of the three tables, and the one whose sorting is NOT done in the
- * browser. There are 420 flights and this table only ever holds 50 of them, so
- * sorting client-side would only sort the current page — wrong answer. json-server
- * does the sorting; the table just tracks which column and direction.
- *
- * TODO 3a — Feature set: `columnSizingFeature` + `rowSortingFeature`, and
- *   NO `sortedRowModel` — that's the row model that re-sorts rows in the
- *   browser, and here we don't want it. Add a `tableMeta` slot typed
- *   `{ openBooking: (target: BookingTarget) => void }` for the Book button
- *   (same pattern as exercise 2).
- *
- * TODO 3b — Columns. Mostly accessors, plus one display column for the Book
- *   button that calls `table.options.meta?.openBooking({ kind: "flight",
- *   flight: row.original })`. Give the Route column `enableSorting: false` —
- *   it's a composed string, so there's no meaningful column to sort on.
- *
- * TODO 3c — Create the table with manual sorting:
- *
- *     useTable({
- *       features, data: flatData, columns,
- *       state: { sorting },
- *       onSortingChange: setSorting,
- *       manualSorting: true,        // ← json-server sorts, not the table
- *       getRowId: (row) => String(row.id),
- *       meta: { openBooking },
- *     }, (state) => state)
- *
- *   `manualSorting: true` tells the table "the data arriving is already
- *   sorted, just track the state and let me refetch." Since `sorting` is part
- *   of the query key, changing it refetches automatically. Try flipping it to
- *   false and sorting by price to see the difference — you'll sort 50 rows
- *   instead of 420.
- *
- * TODO 3d — Render headers/cells with `table.FlexRender` and add the sortable
- *   header buttons + SortIndicator, same as the other two tables.
- *
- * TODO 3e — `useTanStackTableDevtools(table)`.
- *
- * The filters, the price-history chart, and the pagination below are all
- * given — leave them alone.
- * ==========================================================================*/
+ * TODO 3a — feature set: sizing + sorting, NO sortedRowModel (the API sorts).
+ * TODO 3b — columns, incl. a Book display column that uses table meta.
+ * TODO 3c — create the table with manualSorting: true and sorting in state.
+ * TODO 3d — render through table.FlexRender with sortable headers.
+ * TODO 3e — register with devtools.
+ */
 
 const selectClass =
   "h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -124,7 +87,6 @@ function BookPage() {
     })
   }
 
-
   const { openBooking } = useBooking()
 
   const [page, setPage] = React.useState(0)
@@ -143,7 +105,6 @@ function BookPage() {
   React.useEffect(() => {
     setPage(0)
   }, [filters.from, filters.to, filters.date, filters.q])
-
 
   return (
     <div className="space-y-6">
@@ -290,9 +251,7 @@ function BookPage() {
                     <Button
                       size="sm"
                       className="ml-auto"
-                      onClick={() =>
-                        openBooking({ kind: "flight", flight })
-                      }
+                      onClick={() => openBooking({ kind: "flight", flight })}
                     >
                       Book
                     </Button>
@@ -303,8 +262,7 @@ function BookPage() {
           </tbody>
         </table>
 
-        {/* Classic pagination. The TODO above replaces all of this with an
-          * infinite, virtualized scroll container. */}
+        {/* Classic pagination — becomes infinite scroll in a later checkpoint. */}
         <div className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
           <span>
             Page {page + 1} of {pageCount} · {totalRowCount.toLocaleString()}{" "}

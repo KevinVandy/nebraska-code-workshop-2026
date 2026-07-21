@@ -28,6 +28,15 @@ All four TODOs are in `src/routes/_marketing/contact.tsx`:
 **Given:** the page layout, the map/HQ sidebar, and `sendMessage` (the API
 call isn't the lesson).
 
+**Validation rules for the schema (TODO 1):**
+
+| Field | Rule | Message |
+|-------|------|---------|
+| `name` | at least 2 chars | "Please tell us your name." |
+| `email` | valid email | "Enter a valid email address." |
+| `subject` | at least 3 chars | "Add a short subject." |
+| `message` | 10–1000 chars | "Give us a little more detail (at least 10 characters)." / "That's a bit long — keep it under 1000 characters." |
+
 ## You already have three worked examples
 
 TanStack Form is used elsewhere in this app, and those files are your best

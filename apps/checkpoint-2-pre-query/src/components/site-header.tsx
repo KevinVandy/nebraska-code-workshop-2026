@@ -40,9 +40,7 @@ export function SiteHeader() {
   const { toggle } = useCasper()
   const { openPalette } = useShortcuts()
   const navigate = useNavigate()
-  /* The signed-in user, fetched here — and again in the profile page, and
-   * again on the dashboard overview. Three components, three requests for the
-   * same record, no cache between them. */
+  // The signed-in user — also fetched by the overview and profile pages.
   const [user, setUser] = React.useState<User | null>(null)
   React.useEffect(() => {
     if (session?.userId == null) {

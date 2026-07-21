@@ -40,8 +40,6 @@ export function AuthProvider({
   const signOut = React.useCallback(() => {
     clearClientSession()
     setSession(null)
-    // TODO 4 — once there's a query cache, clear it here so the next account
-    // doesn't see the previous user's data.
   }, [])
 
   const value = React.useMemo(

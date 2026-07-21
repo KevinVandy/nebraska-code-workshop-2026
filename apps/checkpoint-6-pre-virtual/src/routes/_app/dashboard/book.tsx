@@ -113,7 +113,6 @@ function BookPage() {
     })
   }
 
-
   const { openBooking } = useBooking()
 
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -171,94 +170,10 @@ function BookPage() {
     []
   )
 
-  /* TODO — Replace this paged query with an INFINITE one, then virtualize
-   * the rows. Two steps; get step 1 working before you start step 2.
-   *
-   * ── Step 1: useInfiniteQuery ──────────────────────────────────────────
-   *
-   * In src/lib/api.ts, turn `flightsPageQuery` into `flightsInfiniteQuery`
-   * using `infiniteQueryOptions`. It no longer takes a `page` argument —
-   * TanStack Query tracks that for you:
-   *
-   *   queryKey: ["flights", "infinite", sorting, filters],
-   *   queryFn: ({ pageParam }) => fetchFlightsPage(pageParam, sorting, filters),
-   *   initialPageParam: 0,
-   *   getNextPageParam: (lastPage, pages) => {
-   *     const loaded = pages.length * FLIGHTS_PAGE_SIZE
-   *     return loaded < lastPage.meta.totalRowCount ? pages.length : undefined
-   *   },
-   *
-   * Returning `undefined` from getNextPageParam is how you say "no more
-   * pages" — that's what sets `hasNextPage` to false.
-   *
-   * Here, swap `useQuery` for `useInfiniteQuery`. You now get pages instead
-   * of rows, so flatten them for the table:
-   *
-   *   const flatData = React.useMemo(
-   *     () => data?.pages.flatMap((p) => p.data) ?? [],
-   *     [data]
-   *   )
-   *
-   * Then delete the `page` state and the Prev/Next buttons at the bottom of
-   * this file, and load the next page from scroll position instead:
-   *
-   *   const fetchMoreOnBottomReached = React.useCallback((el) => {
-   *     if (!el) return
-   *     const { scrollHeight, scrollTop, clientHeight } = el
-   *     if (scrollHeight - scrollTop - clientHeight < 500 && !isFetching && hasNextPage) {
-   *       fetchNextPage()
-   *     }
-   *   }, [fetchNextPage, isFetching, hasNextPage])
-   *
-   * Wire it to the scroll container's onScroll, and also call it from an
-   * effect on mount — if the first page doesn't fill the viewport, nothing
-   * would ever trigger the second one.
-   *
-   * Don't forget the tab-bar hover prefetch in src/routes/_app/dashboard.tsx:
-   * `ensureQueryData` becomes `ensureInfiniteQueryData`, and the key has to
-   * match exactly or you'll silently prefetch nothing.
-   *
-   * ── Step 2: useVirtualizer ────────────────────────────────────────────
-   *
-   * Scroll far enough now and you'll have thousands of <tr>s in the DOM.
-   * TanStack Virtual renders only what's visible:
-   *
-   *   const rowVirtualizer = useVirtualizer({
-   *     count: rows.length,
-   *     estimateSize: () => 48,
-   *     getScrollElement: () => tableContainerRef.current,
-   *     overscan: 8,
-   *   })
-   *
-   * The markup has to change shape for this. A normal <table> can't be
-   * absolutely positioned, so the table becomes CSS grid/flex:
-   *   - <table className="grid">, <thead className="grid">,
-   *     <tr className="flex">, <td className="flex">
-   *   - <tbody> is `relative grid` with an explicit
-   *     height: rowVirtualizer.getTotalSize()
-   *   - each row is `absolute` with
-   *     transform: translateY(virtualRow.start)
-   *   - map over rowVirtualizer.getVirtualItems() instead of `rows`
-   *   - give each row data-index={virtualRow.index} and
-   *     ref={(node) => rowVirtualizer.measureElement(node)}
-   *
-   * Add `measureElement` to the virtualizer options for real (not estimated)
-   * row heights — but skip it in Firefox, which reports table-row border
-   * heights incorrectly:
-   *
-   *   measureElement:
-   *     typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1
-   *       ? (el) => el.getBoundingClientRect().height
-   *       : undefined,
-   *
-   * Finally, reset the scroll to the top when sorting changes, or you'll be
-   * left halfway down a list that just reordered:
-   *
-   *   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
-   *     setSorting(updater)
-   *     rowVirtualizer.scrollToIndex(0)
-   *   }
-   *   table.setOptions((prev) => ({ ...prev, onSortingChange: handleSortingChange }))
+  /* EXERCISE — two steps, in order (walkthrough in EXERCISE.md):
+   * TODO 1 — convert this paged query to useInfiniteQuery (touches lib/api.ts
+   *          and the hover prefetch in dashboard.tsx) and fetch on scroll.
+   * TODO 2 — virtualize the rows with useVirtualizer (markup becomes grid/flex).
    */
   const { data, isFetching, isLoading } = useQuery(
     flightsPageQuery(page, sorting, filters)
@@ -441,8 +356,7 @@ function BookPage() {
           </tbody>
         </table>
 
-        {/* Classic pagination. The TODO above replaces all of this with an
-          * infinite, virtualized scroll container. */}
+        {/* Classic pagination — TODO 1 replaces this with infinite scroll. */}
         <div className="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
           <span>
             Page {page + 1} of {pageCount} · {totalRowCount.toLocaleString()}{" "}

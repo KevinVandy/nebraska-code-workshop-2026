@@ -46,53 +46,14 @@ export function CasperDrawer() {
   const [input, setInput] = React.useState("")
   const messagesRef = React.useRef<HTMLDivElement>(null)
 
-  /* TODO 3a — Register the client tool.
-   *
-   * `applySearchFilters` runs in the BROWSER (it has no server implementation)
-   * because it needs the router. Wire it with `clientTools(...)` and
-   * `applySearchFiltersToolDef.client(...)`, memoised on `navigate`:
-   *
-   *   const navigate = useNavigate()
-   *   const tools = React.useMemo(
-   *     () => clientTools(
-   *       applySearchFiltersToolDef.client((args) => {
-   *         navigate({ to: "/dashboard/book", search: { from: ..., to: ..., q: ... } })
-   *         return { applied: true }
-   *       })
-   *     ),
-   *     [navigate]
-   *   )
-   *
-   * Uppercase the airport codes — the model isn't reliable about casing.
-   */
+  // TODO 3a — register applySearchFilters as a client tool (clientTools + .client()).
 
-  /* TODO 3b — Connect to the server route.
-   *
-   *   const { messages, sendMessage, stop, isLoading, error,
-   *           addToolApprovalResponse } = useChat({
-   *     connection: fetchServerSentEvents("/api/chat"),
-   *     tools,
-   *   })
-   *
-   * Then replace the placeholder `messages`/`isLoading`/`error` below.
-   */
+  // TODO 3b — replace these placeholders with useChat({ connection, tools }).
   const messages: Array<{ id: string; role: string }> = []
   const isLoading = false as boolean
   const error = undefined as Error | undefined
 
-  /* TODO 3c — Refetch the dashboard after a booking or cancellation.
-   *
-   * When bookFlight/cancelTrip completes, the dashboard behind the drawer is
-   * stale. Watch `messages` in an effect and invalidate ["trips"] + ["flights"]
-   * when you see a tool-call part with output for either tool.
-   *
-   * Two gotchas:
-   *   - Track which part ids you've already handled in a ref. Without that you
-   *     re-invalidate on every stream tick.
-   *   - useChat narrows tool names to the registered *client* tools, so
-   *     checking for "bookFlight" won't typecheck. Widen with
-   *     `messages as UIMessage[]` and leave a comment saying why.
-   */
+  // TODO 3c — invalidate ["trips"] and ["flights"] when bookFlight/cancelTrip complete.
 
   // GIVEN: keep the transcript pinned to the newest message.
   React.useEffect(() => {
@@ -164,21 +125,12 @@ export function CasperDrawer() {
           </div>
         ) : null}
 
-        {/* TODO 3d — render the transcript:
-         *
-         *   messages.map((message) => (
-         *     <Message key={message.id} message={message} busy={isLoading}
-         *       onBookFlight={(flight) => send(`Please book flight ...`)}
-         *       onApproval={(id, approved) =>
-         *         addToolApprovalResponse({ id, approved })} />
-         *   ))
-         */}
+        {/* TODO 3d — render the transcript: one <Message> per messages entry. */}
 
         {isLoading ? (
           <div className="flex items-center gap-2">
             <p className="text-xs text-muted-foreground">Casper is thinking…</p>
-            {/* TODO 3b — wire this to useChat's `stop()`. A stalled stream
-              * shouldn't freeze the drawer for the rest of the demo. */}
+            {/* TODO 3b — wire this to useChat's stop(). */}
             <button
               type="button"
               className="text-xs text-muted-foreground underline hover:text-foreground"
@@ -221,34 +173,11 @@ export function CasperDrawer() {
   )
 }
 
-/* ============================================================================
- * EXERCISE 4 — Generative UI
- * ============================================================================
+/* EXERCISE 4 — generative UI (part-to-component mapping in EXERCISE.md).
  *
- * A message is a list of PARTS. Text parts are bubbles; `tool-call` parts are
- * where generative UI happens — instead of printing JSON, you render a real
- * component per tool.
- *
- * TODO 4 — Write the `Message` component. For each part:
- *   - type === "text"                → a chat bubble (user right, assistant left)
- *   - type !== "tool-call"           → skip
- *   - state === "approval-requested" → <ApprovalRequest>   (bookFlight/cancelTrip)
- *   - name === "searchFlights"   + output → <SearchResults>
- *   - name === "bookFlight"      + output → <BookingConfirmation>
- *   - name === "getMyTrips"      + output → <TripsList>
- *   - name === "applySearchFilters" + output → a one-line "✓ Filters applied"
- *   - no output yet                  → WORKING_LABELS[part.name] fallback
- *
- * The components below take plain typed props — you supply
- * `part.output as SearchResultsOutput` etc. (the server validated the shape
- * against your outputSchema; the stream types it as unknown). Leave a comment
- * noting that.
- *
- * Suggested signature:
- *   function Message({ message, onBookFlight, onApproval, busy }: {...})
- *
- * Everything below this line is GIVEN — you shouldn't need to edit it.
- * ==========================================================================*/
+ * TODO 4 — write the Message component: text parts become chat bubbles, and
+ * each tool-call part renders one of the GIVEN components below.
+ * Everything below this line is given — you shouldn't need to edit it. */
 
 export interface SearchResultsOutput {
   flights?: FlightSummary[]

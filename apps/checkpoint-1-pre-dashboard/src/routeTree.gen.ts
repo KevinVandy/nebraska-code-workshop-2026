@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as MarketingRouteImport } from './routes/_marketing'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
 import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
@@ -25,6 +26,11 @@ const AppRoute = AppRouteImport.update({
 const MarketingRoute = MarketingRouteImport.update({
   id: '/_marketing',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
@@ -59,6 +65,7 @@ const MarketingSignupRoute = MarketingSignupRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
+  '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof MarketingIndexRoute
+  '/dashboard': typeof AppDashboardRoute
   '/profile': typeof AppProfileRoute
   '/about': typeof MarketingAboutRoute
   '/contact': typeof MarketingContactRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_marketing': typeof MarketingRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRoute
   '/_app/profile': typeof AppProfileRoute
   '/_marketing/about': typeof MarketingAboutRoute
   '/_marketing/contact': typeof MarketingContactRoute
@@ -86,13 +95,28 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile' | '/about' | '/contact' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/profile'
+    | '/about'
+    | '/contact'
+    | '/login'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile' | '/about' | '/contact' | '/login' | '/signup'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/profile'
+    | '/about'
+    | '/contact'
+    | '/login'
+    | '/signup'
   id:
     | '__root__'
     | '/_app'
     | '/_marketing'
+    | '/_app/dashboard'
     | '/_app/profile'
     | '/_marketing/about'
     | '/_marketing/contact'
@@ -121,6 +145,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MarketingRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/profile': {
       id: '/_app/profile'
@@ -168,10 +199,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppDashboardRoute: typeof AppDashboardRoute
   AppProfileRoute: typeof AppProfileRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppDashboardRoute: AppDashboardRoute,
   AppProfileRoute: AppProfileRoute,
 }
 

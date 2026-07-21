@@ -36,10 +36,7 @@ export function DealCard({
 }) {
   const { session } = useAuth()
   const { openBooking } = useBooking()
-  /* Show the LIVE cheapest fare so the card never disagrees with the price the
-   * booking dialog resolves. Every card runs its own effect — four cards on
-   * the home page means four requests, repeated on every mount, with nothing
-   * shared between them or with the dialog that asks for the same thing. */
+  // Live cheapest fare. Four cards = four separate requests, nothing shared.
   const [livePrice, setLivePrice] = React.useState<number | null>(null)
   React.useEffect(() => {
     let ignore = false

@@ -50,25 +50,8 @@ export function CommandPalette({
   const [text, setText] = React.useState("")
   const [query, setQuery] = React.useState("")
 
-  /* TODO 2 — Debounce this search too, with `useDebouncer`.
-   *
-   * Same problem as the Book tab: every keystroke currently sets `query`,
-   * which changes the query key and fires a request.
-   *
-   *   const queryDebouncer = useDebouncer((value: string) => setQuery(value), {
-   *     wait: 300,
-   *   })
-   *
-   * Use `useDebouncer` here rather than `useDebouncedCallback` — it returns
-   * the debouncer OBJECT, which exposes `.maybeExecute(value)` to schedule and
-   * `.cancel()` to drop anything pending.
-   *
-   * Then call `.cancel()` in the reset effect below. Without it there's a real
-   * bug: type "sal", hit Escape within 300ms, reopen — the stale timer fires
-   * after the reset and you get phantom flight rows under an empty input. Try
-   * it before you add the cancel.
-   */
-
+  /* TODO 2 — debounce this search with useDebouncer (not useDebouncedCallback:
+   * you'll need its .cancel() in the reset effect below — see EXERCISE.md). */
   // Reset whenever it opens so you always start fresh.
   React.useEffect(() => {
     if (open) {
@@ -135,7 +118,7 @@ export function CommandPalette({
             value={text}
             onChange={(e) => {
               setText(e.target.value)
-              // TODO 2 — route this through the debouncer instead.
+              // TODO 2 — route this through the debouncer.
               setQuery(e.target.value)
             }}
             placeholder="Search commands or flights…"

@@ -14,13 +14,11 @@ export function Devtools() {
     <TanStackDevtools
       config={{ hideUntilHover: true }}
       plugins={[
-        // TODO 4 — add the TanStack Query devtools panel here.
         {
           id: "tanstack-router",
           name: "TanStack Router",
           render: <TanStackRouterDevtoolsPanel />,
         },
-        // TODO 1e — add tableDevtoolsPlugin() here.
         formDevtoolsPlugin(),
       ]}
     />

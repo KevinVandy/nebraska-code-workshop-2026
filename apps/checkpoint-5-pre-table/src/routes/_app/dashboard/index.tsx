@@ -58,62 +58,13 @@ async function cancelTrip(tripId: number) {
   if (!res.ok) throw new Error(`Failed to cancel trip ${tripId}`)
 }
 
-/* ============================================================================
- * EXERCISE 2 of 3 — TanStack Table: row selection
- * ============================================================================
+/* EXERCISE 2 of 3 — row selection. Do status.tsx first (details in EXERCISE.md).
  *
- * Do status.tsx first. This table adds the two things that one didn't have:
- * row selection, and cells that need to reach a mutation.
- *
- * TODO 2a — Feature set. Same as status.tsx plus `rowSelectionFeature`.
- *   Registering features per-table is the point: only THIS table needs
- *   selection, so only this one pays for it.
- *
- * TODO 2b — Columns. Alongside the data columns, add a display column for the
- *   checkbox:
- *
- *     columnHelper.display({
- *       id: "select",
- *       header: ({ table }) => <input type="checkbox"
- *         checked={table.getIsAllRowsSelected()}
- *         onChange={table.getToggleAllRowsSelectedHandler()} />,
- *       cell: ({ row }) => <input type="checkbox"
- *         checked={row.getIsSelected()}
- *         onChange={row.getToggleSelectedHandler()} />,
- *     })
- *
- *   A checkbox has three visual states, and "some but not all" only exists as
- *   a DOM property — so the header one needs a ref:
- *     ref={(el) => { if (el) el.indeterminate = table.getIsSomeRowsSelected() }}
- *
- * TODO 2c — The Cancel button, and how cells reach a mutation.
- *
- *   Column definitions live at module level and are memoised — so they must
- *   NOT close over per-render values like a mutation object. The wrong fix is
- *   a ref you write during render. The right one is table meta: declare its
- *   type on the feature set,
- *
- *     tableMeta: metaHelper<{
- *       cancelTrip: (tripId: number) => void
- *       cancellingId?: number
- *     }>(),
- *
- *   pass the values in `useTable({ ..., meta: { ... } })`, and read them in
- *   the cell via `table.options.meta`. Fully typed, no stale closures.
- *
- * TODO 2d — Selection state and the bulk action.
- *
- *    *     useTable({ ..., state: { rowSelection }, onRowSelectionChange: setRowSelection,
- *                getRowId: (row) => String(row.id) })
- *
- *   `getRowId` matters here: it makes the selection keys real trip ids, so the
- *   "Cancel selected" button can just read Object.keys(rowSelection). Without
- *   it you get array indices, which break the moment the data reorders.
- *
- *   Then render a "Cancel selected (n)" button in the card header when
- *   anything is checked.
- * ==========================================================================*/
-
+ * TODO 2a — feature set: same as status.tsx plus rowSelectionFeature.
+ * TODO 2b — add a checkbox display column (header checkbox needs `indeterminate`).
+ * TODO 2c — reach the cancel mutation from cells via typed table meta, not closures.
+ * TODO 2d — selection state + getRowId, then a "Cancel selected (n)" bulk action.
+ */
 
 function OverviewPage() {
   const queryClient = useQueryClient()
@@ -131,7 +82,6 @@ function OverviewPage() {
       queryClient.invalidateQueries({ queryKey: ["trips"] })
     },
   })
-
 
   // Aggregate trips-per-month for the chart, skipping cancelled trips so the
   // bars visibly drop when a trip is cancelled from the table below.
@@ -235,7 +185,7 @@ function OverviewPage() {
         </CardHeader>
         <CardContent>
           {/* TODO 2 — replace this hand-written markup with a TanStack Table
-            * that supports sorting, row selection, and a bulk-cancel action. */}
+           * that supports sorting, row selection, and a bulk-cancel action. */}
           <Table>
             <TableHeader>
               <TableRow>

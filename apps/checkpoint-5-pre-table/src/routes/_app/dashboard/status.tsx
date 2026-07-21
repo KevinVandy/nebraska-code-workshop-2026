@@ -18,73 +18,14 @@ import {
 import { StatusBadge } from "@/components/status-badge"
 import { airportsQuery, flightStatusQuery } from "@/lib/api"
 
-/* ============================================================================
- * EXERCISE 1 of 3 — TanStack Table
- * ============================================================================
+/* EXERCISE 1 of 3 — TanStack Table. Start here (details in EXERCISE.md).
  *
- * Start here: this is the simplest of the app's three tables. It's currently
- * hand-written markup — hardcoded <TableHead>s and a .map() of <TableRow>s.
- * That works, but it can't sort, and every column's rendering logic is tangled
- * into the JSX.
- *
- * TODO 1a — Declare this table's feature set.
- *
- * v9 is opt-in: a table only gets the features you register, which keeps the
- * bundle small. This one needs client-side sorting and column sizing:
- *
- *   const features = tableFeatures({
- *     columnSizingFeature,
- *     rowSortingFeature,
- *     sortedRowModel: createSortedRowModel(),
- *     sortFns: { alphanumeric: sortFn_alphanumeric, basic: sortFn_basic,
- *                datetime: sortFn_datetime, text: sortFn_text },
- *   })
- *
- * TODO 1b — Define the columns with a column helper.
- *
- *   const columnHelper = createColumnHelper<typeof features, StatusRow>()
- *   const columns = columnHelper.columns([
- *     columnHelper.accessor("flightNumber", { header: "Flight", size: 120 }),
- *     ...
- *   ])
- *
- * Move the per-cell formatting out of the JSX below and into `cell` renderers
- * — e.g. the StatusBadge, and formatTime for the scheduled column. Note the
- * columns array is defined at MODULE level here, outside the component: these
- * definitions don't depend on anything that changes per render.
- *
- * TODO 1c — Create the table and render it.
- *
- *   const table = useTable({ features, data: rows, columns,
- *                            getRowId: (row) => String(row.id) }, (s) => s)
- *
- * Then swap the hardcoded markup for `table.getHeaderGroups()` and
- * `table.getRowModel().rows`, rendering each header/cell through
- * `<table.FlexRender header={header} />` / `<table.FlexRender cell={cell} />`.
- *
- * TODO 1d — Make the headers sortable.
- *
- * Wrap each header in a button wired to `header.column.getToggleSortingHandler()`,
- * disabled when `!header.column.getCanSort()`. Add a fixed-width sort arrow so
- * the header text doesn't shift when it appears:
- *
- *   function SortIndicator({ sorted }: { sorted: false | string }) {
- *     return (
- *       <span aria-hidden className="w-3 shrink-0 text-xs leading-none">
- *         {sorted === "asc" ? "↑" : sorted === "desc" ? "↓" : ""}
- *       </span>
- *     )
- *   }
- *
- * TODO 1e — Register the table with devtools.
- *
- *   useTanStackTableDevtools(table)
- *
- * and add `tableDevtoolsPlugin()` to src/components/devtools.tsx. You'll want
- * it for the next two tables.
- *
- * Docs: https://tanstack.com/table
- * ==========================================================================*/
+ * TODO 1a — declare this table's feature set with tableFeatures().
+ * TODO 1b — define typed columns with createColumnHelper.
+ * TODO 1c — create the table with useTable and render it via table.FlexRender.
+ * TODO 1d — make the headers sortable, with a fixed-width sort indicator.
+ * TODO 1e — register the table with the devtools (hook + plugin).
+ */
 
 export const Route = createFileRoute("/_app/dashboard/status")({
   component: StatusPage,

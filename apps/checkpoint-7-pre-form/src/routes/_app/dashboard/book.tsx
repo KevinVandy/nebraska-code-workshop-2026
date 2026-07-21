@@ -114,7 +114,6 @@ function BookPage() {
     })
   }
 
-
   const { openBooking } = useBooking()
 
   const tableContainerRef = React.useRef<HTMLDivElement>(null)

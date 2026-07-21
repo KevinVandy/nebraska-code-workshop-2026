@@ -82,13 +82,7 @@ export function CommandPalette({
   const close = () => onOpenChange(false)
 
   const commands: Command[] = [
-    /* TODO 4 — add navigation commands for the dashboard tabs once those
-     * routes exist. `navigate({ to: ... })` autocompletes every real route,
-     * so start typing "/dash" and let it fill them in:
-     *     Go to Overview        → /dashboard
-     *     Go to Book a Flight   → /dashboard/book
-     *     Go to Flight Status   → /dashboard/status
-     */
+    // TODO 4 — add "Go to …" commands for the three dashboard tabs.
     {
       id: "profile",
       label: "Go to Profile",
@@ -159,9 +153,7 @@ export function CommandPalette({
                   hint={`$${flight.price}`}
                   onSelect={() => {
                     close()
-                    /* TODO 4 — jump to the Book tab filtered to this flight:
-                     *   navigate({ to: "/dashboard/book",
-                     *              search: { q: flight.flightNumber } }) */
+                    // TODO 4 — navigate to the Book tab filtered to this flight number.
                   }}
                 />
               ))}

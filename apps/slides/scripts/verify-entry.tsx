@@ -6,7 +6,11 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 function pressKey(key: string) {
   document.body.dispatchEvent(
-    new window.KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+    new window.KeyboardEvent("keydown", {
+      key,
+      bubbles: true,
+      cancelable: true,
+    })
   )
 }
 
@@ -14,7 +18,7 @@ function report(label: string) {
   const lis = Array.from(document.querySelectorAll("main li"))
   const hidden = lis.filter((li) => li.classList.contains("bullet-hidden"))
   console.log(
-    `${label}: slide=${window.location.hash} lis=${lis.length} hidden=${hidden.length}`,
+    `${label}: slide=${window.location.hash} lis=${lis.length} hidden=${hidden.length}`
   )
   return { total: lis.length, hidden: hidden.length }
 }
@@ -46,6 +50,8 @@ export async function run() {
   const revealWorks =
     after1.hidden === initial.total - 1 && after2.hidden === initial.total - 2
   const showAllWorks = afterAll.hidden === 0 && window.location.hash === "#17"
-  console.log(revealWorks ? "PASS: arrow reveal works" : "FAIL: arrow reveal broken")
+  console.log(
+    revealWorks ? "PASS: arrow reveal works" : "FAIL: arrow reveal broken"
+  )
   console.log(showAllWorks ? 'PASS: "." reveals all' : 'FAIL: "." broken')
 }

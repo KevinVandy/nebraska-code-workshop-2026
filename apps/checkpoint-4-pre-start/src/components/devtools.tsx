@@ -25,7 +25,6 @@ export function Devtools() {
           name: "TanStack Router",
           render: <TanStackRouterDevtoolsPanel />,
         },
-        // TODO 1e — add tableDevtoolsPlugin() here.
         formDevtoolsPlugin(),
       ]}
     />

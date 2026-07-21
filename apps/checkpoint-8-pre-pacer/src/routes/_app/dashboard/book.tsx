@@ -114,45 +114,9 @@ function BookPage() {
     })
   }
 
-  /* TODO 1 — Debounce the search box with TanStack Pacer.
-   *
-   * Right now the input writes straight to the URL on every keystroke (see the
-   * Search field below). Each write changes the query key, which refetches.
-   * Open the Network tab and type "salem" — that's six requests, and with the
-   * API's 1s fake delay the results visibly thrash.
-   *
-   * Split it into the cheap part and the expensive part:
-   *
-   *   1. Local state so typing stays instant:
-   *        const [searchText, setSearchText] = React.useState(filters.q ?? "")
-   *
-   *   2. Debounce only the expensive part (URL write → refetch):
-   *        const commitSearch = useDebouncedCallback(
-   *          (value: string) => setFilter("q", value),
-   *          { wait: 400 }
-   *        )
-   *
-   *   3. In the input's onChange, call BOTH: setSearchText (instant) and
-   *      commitSearch (debounced).
-   *
-   *   4. Now a second problem appears. `?q=` can also change from OUTSIDE the
-   *      input — the back button, or the command palette jumping to a flight
-   *      number. Local state won't know. Add an effect that syncs
-   *      searchText from filters.q...
-   *
-   *      ...but guard it. If it runs while the user is typing, it clobbers
-   *      keystrokes that landed during the 400ms gap. Skip the sync when the
-   *      input is focused:
-   *
-   *        const searchInputRef = React.useRef<HTMLInputElement>(null)
-   *        React.useEffect(() => {
-   *          if (document.activeElement === searchInputRef.current) return
-   *          setSearchText(filters.q ?? "")
-   *        }, [filters.q])
-   *
-   *      Try it without the guard first and type fast — you'll see characters
-   *      get eaten.
-   */
+  /* TODO 1 — debounce the Search box with useDebouncedCallback: typing stays
+   * instant in local state, the URL write (→ refetch) waits 400ms. Steps and
+   * the two gotchas are in EXERCISE.md. */
 
   const { openBooking } = useBooking()
 
@@ -338,7 +302,7 @@ function BookPage() {
             <Input
               id="search"
               placeholder="Flight #, city, or airport code"
-              // TODO 1 — a request per keystroke. Debounce this.
+              // TODO 1 — this fires a request per keystroke.
               value={filters.q ?? ""}
               onChange={(e) => setFilter("q", e.target.value)}
             />

@@ -28,8 +28,17 @@ renders and its `useQuery` runs.
 ## The exercise
 
 All the TODOs are in `src/routes/_app/dashboard.tsx`. You'll add hover
-prefetching to the three tabs, using queries that already exist in
-`src/lib/api.ts`.
+prefetching to the three tabs — `onMouseEnter` and `onFocus` on each `Link` —
+using queries that already exist in `src/lib/api.ts`:
+
+| Tab | Queries to prefetch |
+|-----|---------------------|
+| `/dashboard` | `currentUserQuery`, `upcomingTripsQuery`, `allTripsQuery`, `dealsQuery` |
+| `/dashboard/book` | `airportsQuery`, `flightsPageQuery(0, [], {})` |
+| `/dashboard/status` | `airportsQuery`, `flightStatusQuery` |
+
+(`session` comes from `Route.useRouteContext()` — the `_app` guard already
+narrowed it to non-null.)
 
 The whole change is a handful of lines, which is the point: because the route
 and the prefetch build the **same query key**, the prefetch writes into the

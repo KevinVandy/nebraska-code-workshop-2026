@@ -156,9 +156,7 @@ function BookingDialog({
   const flight: Flight | null =
     target?.kind === "flight" ? target.flight : cheapest
 
-  /* Booking. After it succeeds the dashboard's trip list is out of date, and
-   * from here there's no way to tell it so — it refetches when it next
-   * mounts, and not before. */
+  // Booking works — but the dashboard's trip list has no way to find out.
   const [isBooking, setIsBooking] = React.useState(false)
   const [bookError, setBookError] = React.useState<Error | null>(null)
 

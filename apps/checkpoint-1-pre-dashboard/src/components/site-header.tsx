@@ -80,16 +80,10 @@ export function SiteHeader() {
           <Link to="/contact" className={navLinkClass}>
             Contact
           </Link>
-          {/* TODO 4 — Dashboard belongs here, alongside the marketing links,
-            * but only once signed in:
-            *
-            *   {session ? (
-            *     <Link to="/dashboard" className={navLinkClass}>Dashboard</Link>
-            *   ) : null}
-            *
-            * Type `to="/dash` and let autocomplete finish it. Until the route
-            * file exists, TypeScript rejects the string outright — that's the
-            * whole point of this exercise. */}
+          {/* TODO 4 — add a signed-in-only Dashboard nav link here. */}
+          <Link to="/dashboard" className={navLinkClass}>
+            Dashboard
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">

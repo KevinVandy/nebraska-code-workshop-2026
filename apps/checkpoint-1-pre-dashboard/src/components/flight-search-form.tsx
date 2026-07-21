@@ -37,17 +37,7 @@ export function FlightSearchForm() {
       className="grid gap-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end"
       onSubmit={(e) => {
         e.preventDefault()
-        /* TODO 4 — send the search to the Book tab once it exists:
-         *
-         *   navigate({
-         *     to: "/dashboard/book",
-         *     search: { from: from || undefined, to: to || undefined,
-         *               date: date || undefined },
-         *   })
-         *
-         * Note `search` is typed by that route's `validateSearch` schema — you
-         * can't pass a key it doesn't declare. Try adding `foo: 1` once it's
-         * wired and see what TypeScript says. */
+        // TODO 4 — navigate to the Book tab with these values as typed search params.
       }}
     >
       <div className="grid gap-1.5">

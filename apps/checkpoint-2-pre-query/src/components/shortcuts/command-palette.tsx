@@ -51,9 +51,7 @@ export function CommandPalette({
     }
   }, [open])
 
-  /* Search-as-you-type, by hand. The `ignore` guard is doing real work here:
-   * without it a slow response for "sal" can land after a fast one for
-   * "salem" and overwrite the newer results. */
+  // Search-as-you-type, by hand — the `ignore` guard prevents a real race.
   const [flights, setFlights] = React.useState<Flight[]>([])
   const [isSearching, setIsSearching] = React.useState(false)
 
