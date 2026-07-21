@@ -81,9 +81,6 @@ export function SiteHeader() {
             Contact
           </Link>
           {/* TODO 4 — add a signed-in-only Dashboard nav link here. */}
-          <Link to="/dashboard" className={navLinkClass}>
-            Dashboard
-          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
