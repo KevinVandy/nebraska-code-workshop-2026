@@ -296,7 +296,7 @@ export function SectionSlide({
 /** Two-column body for pairing a list with a visual or callout. */
 export function Columns({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-start">
+    <div className="slide-columns grid grid-cols-1 gap-10 md:grid-cols-2 md:items-start">
       {children}
     </div>
   )

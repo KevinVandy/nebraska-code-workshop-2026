@@ -1,0 +1,24 @@
+## SSG — Static Site Generation
+
+<DataFlowDiagram
+  steps={[
+    {
+      actor: "server",
+      tag: "Build time",
+      text: "Fetch data during the build (CI/CD pipeline)",
+    },
+    {
+      actor: "server",
+      tag: "Build time",
+      text: "Render every page to full, populated HTML",
+    },
+    { actor: "server", text: "Deploy the static files to a CDN" },
+    { actor: "browser", text: "User hits the website" },
+    {
+      actor: "server",
+      text: "CDN responds with complete HTML — the data is already in it!",
+    },
+    { actor: "browser", text: "Page paints instantly, then hydrates" },
+  ]}
+  callout="Only as fresh as your last deploy. ISR (Next.js, Astro) is SSG that rebuilds stale pages on the server automatically."
+/>

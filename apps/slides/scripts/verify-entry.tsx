@@ -15,16 +15,16 @@ function pressKey(key: string) {
 }
 
 function report(label: string) {
-  const lis = Array.from(document.querySelectorAll("main li"))
-  const hidden = lis.filter((li) => li.classList.contains("bullet-hidden"))
+  const items = Array.from(document.querySelectorAll("main li, main .slide-reveal"))
+  const hidden = items.filter((el) => el.classList.contains("bullet-hidden"))
   console.log(
-    `${label}: slide=${window.location.hash} lis=${lis.length} hidden=${hidden.length}`
+    `${label}: slide=${window.location.hash} items=${items.length} hidden=${hidden.length}`
   )
-  return { total: lis.length, hidden: hidden.length }
+  return { total: items.length, hidden: hidden.length }
 }
 
 export async function run() {
-  window.location.hash = "#17" // router overview slide
+  window.location.hash = "#41" // CSR data-flow diagram slide
   const root = createRoot(document.getElementById("root")!)
   root.render(createElement(App))
   await wait(100)
@@ -49,7 +49,7 @@ export async function run() {
 
   const revealWorks =
     after1.hidden === initial.total - 1 && after2.hidden === initial.total - 2
-  const showAllWorks = afterAll.hidden === 0 && window.location.hash === "#17"
+  const showAllWorks = afterAll.hidden === 0 && window.location.hash === "#41"
   console.log(
     revealWorks ? "PASS: arrow reveal works" : "FAIL: arrow reveal broken"
   )

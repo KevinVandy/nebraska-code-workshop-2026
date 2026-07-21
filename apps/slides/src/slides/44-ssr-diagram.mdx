@@ -1,0 +1,24 @@
+## SSR — Server-Side Rendering
+
+<DataFlowDiagram
+  steps={[
+    { actor: "browser", text: "User hits the website" },
+    {
+      actor: "server",
+      text: "Server fetches data at request time",
+    },
+    {
+      actor: "server",
+      text: "Server renders React into full, populated HTML",
+    },
+    {
+      actor: "browser",
+      text: "Browser paints real content immediately — the data is already in the HTML!",
+    },
+    {
+      actor: "browser",
+      text: "JavaScript downloads, then hydration makes it interactive",
+    },
+  ]}
+  callout="Fresh data on every request — most real-time, SEO-friendly websites are built this way."
+/>

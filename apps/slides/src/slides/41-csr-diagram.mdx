@@ -1,0 +1,19 @@
+## CSR — Single Page Applications
+
+<DataFlowDiagram
+  steps={[
+    { actor: "browser", text: "User hits the website" },
+    {
+      actor: "server",
+      text: "Server responds with a shell HTML file and JavaScript bundles",
+    },
+    { actor: "browser", text: "Browser downloads and runs the JavaScript" },
+    {
+      actor: "browser",
+      text: "React renders the page — loading spinners everywhere",
+    },
+    { actor: "browser", text: "Fetch data from an API" },
+    { actor: "browser", text: "React re-renders with real data" },
+  ]}
+  callout="~80% of React apps are probably still plain CSR — and the user stares at spinners while all of this happens."
+/>

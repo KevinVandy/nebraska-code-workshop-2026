@@ -1,0 +1,24 @@
+## RSCs — React Server Components
+
+<DataFlowDiagram
+  steps={[
+    { actor: "browser", text: "User hits the website" },
+    {
+      actor: "server",
+      text: "Server components render — each one can await its own data",
+    },
+    {
+      actor: "server",
+      text: "HTML + the RSC payload stream to the browser as pieces finish",
+    },
+    {
+      actor: "browser",
+      text: "The page appears progressively — Suspense fallbacks fill the gaps",
+    },
+    {
+      actor: "browser",
+      text: "Only client components hydrate — server components ship zero JS",
+    },
+  ]}
+  callout="Fetch per component instead of per page — and the server components' JavaScript never reaches the browser."
+/>

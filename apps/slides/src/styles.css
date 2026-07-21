@@ -242,7 +242,7 @@
   color: var(--color-orange-500);
 }
 
-.slide .slide-reveal {
+.slide img.slide-reveal {
   width: 70%;
   margin: 2rem;
   max-height: 45vh;
@@ -274,6 +274,295 @@
 
 .library-overview-body pre code {
   font-size: clamp(0.75rem, 1.275vw, 1.088rem);
+}
+
+/* Side-by-side code in <Columns> shrinks to overview-slide sizing */
+.slide-columns pre {
+  margin-top: 0;
+}
+
+.slide-columns pre code {
+  font-size: clamp(0.75rem, 1.275vw, 1.088rem);
+}
+
+/* ---- Data-flow swim-lane diagram (Server | Browser) ---- */
+.data-flow {
+  margin-top: 0.5rem;
+}
+
+.data-flow-lane-label {
+  font-size: clamp(1rem, 1.7vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-orange-400);
+}
+
+.data-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border: 1px solid var(--color-zinc-800);
+  border-radius: 0.6rem;
+  background: var(--color-zinc-900);
+  padding: 0.7rem 1rem;
+  font-size: clamp(0.95rem, 1.6vw, 1.35rem);
+  line-height: 1.35;
+  color: var(--color-zinc-300);
+}
+
+.data-flow-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 9999px;
+  background: var(--color-orange-500);
+  color: var(--color-zinc-950);
+  font-weight: 800;
+  font-size: 0.85em;
+}
+
+.data-flow-tag {
+  font-size: 0.65em;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-orange-400);
+}
+
+.data-flow-callout {
+  margin-top: 1.25rem;
+  border-left: 4px solid var(--color-orange-500);
+  border-radius: 0.4rem;
+  background: var(--color-zinc-900);
+  padding: 0.8rem 1.2rem;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  font-style: italic;
+  color: var(--color-zinc-300);
+}
+
+/* ---- Hydration three-stage visual ---- */
+.hydration-visual {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: stretch;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.hydration-arrow {
+  align-self: center;
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+  color: var(--color-zinc-600);
+}
+
+.hydration-stage {
+  border: 1px solid var(--color-zinc-800);
+  border-radius: 0.75rem;
+  background: var(--color-zinc-900);
+  padding: 1.1rem 1.25rem;
+}
+
+.hydration-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--color-zinc-950);
+  border: 1px solid var(--color-zinc-800);
+  padding: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.hydration-line {
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-zinc-700);
+}
+
+.hydration-line.short {
+  width: 60%;
+}
+
+.hydration-button {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.9rem;
+  font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.hydration-stage.is-dry .hydration-button {
+  background: var(--color-zinc-800);
+  color: var(--color-zinc-500);
+  border: 1px dashed var(--color-zinc-600);
+}
+
+.hydration-stage.is-wet .hydration-button {
+  background: var(--color-zinc-800);
+  color: var(--color-zinc-400);
+  border: 1px solid var(--color-sky-500);
+}
+
+.hydration-stage.is-live .hydration-button {
+  background: var(--color-orange-500);
+  color: var(--color-zinc-950);
+  border: 1px solid var(--color-orange-500);
+}
+
+.hydration-stage-title {
+  font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+  font-weight: 700;
+  color: var(--color-zinc-100);
+}
+
+.hydration-stage-body {
+  margin-top: 0.4rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.25rem);
+  line-height: 1.4;
+  color: var(--color-zinc-400);
+}
+
+/* ---- Render-strategy timeline comparison ---- */
+.render-timeline {
+  margin-top: 1.5rem;
+}
+
+.render-timeline-row {
+  display: grid;
+  grid-template-columns: 13rem auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.render-timeline-row + .render-timeline-row {
+  margin-top: 1.4rem;
+}
+
+.render-timeline-name {
+  font-size: clamp(1.1rem, 2vw, 1.7rem);
+  font-weight: 800;
+  text-align: right;
+  color: var(--color-zinc-100);
+}
+
+.render-timeline-pre {
+  font-size: clamp(0.65rem, 1vw, 0.85rem);
+  font-weight: 500;
+  color: var(--color-zinc-500);
+}
+
+/* Tiny stacked lane labels between the name and the bar */
+.render-timeline-lanes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: clamp(3.6rem, 6.5vw, 5.2rem);
+}
+
+.render-timeline-lane-label {
+  font-size: clamp(0.6rem, 0.95vw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-zinc-500);
+  text-align: right;
+}
+
+/* The bar is two lanes tall; segments occupy the lane where the work runs */
+.render-timeline-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: clamp(3.6rem, 6.5vw, 5.2rem);
+  border-left: 2px solid var(--color-zinc-700);
+  padding-left: 3px;
+}
+
+.render-timeline-lane-divider {
+  position: absolute;
+  left: 0;
+  right: 1.5rem;
+  top: 50%;
+  border-top: 1px dashed var(--color-zinc-800);
+}
+
+.render-timeline-seg {
+  position: relative;
+  height: calc(50% - 3px);
+  border-radius: 0.35rem;
+  min-width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.render-timeline-seg.is-server {
+  align-self: flex-start;
+  margin-top: 1px;
+}
+
+.render-timeline-seg.is-browser {
+  align-self: flex-end;
+  margin-bottom: 1px;
+}
+
+.render-timeline-note {
+  font-size: clamp(0.65rem, 1.05vw, 0.9rem);
+  font-weight: 600;
+  color: rgb(0 0 0 / 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-inline: 0.4em;
+}
+
+.render-timeline-paint {
+  position: absolute;
+  right: -0.55em;
+  bottom: -1.35em;
+  z-index: 1;
+  font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+  color: var(--color-zinc-100);
+}
+
+/* From the top (server) lane, drop the marker past the browser lane too */
+.render-timeline-seg.is-server .render-timeline-paint {
+  bottom: calc(-100% - 1.6em);
+}
+
+.render-timeline-done {
+  margin-left: 0.35rem;
+  font-size: clamp(0.9rem, 1.5vw, 1.25rem);
+  color: var(--color-emerald-400);
+}
+
+.render-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 2.25rem;
+  font-size: clamp(0.85rem, 1.4vw, 1.15rem);
+  color: var(--color-zinc-400);
+}
+
+.render-timeline-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.render-timeline-swatch {
+  width: 1em;
+  height: 1em;
+  border-radius: 0.25em;
 }
 
 .slide strong {

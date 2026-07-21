@@ -21,10 +21,18 @@ import {
   TheStack,
   TitleSlide,
 } from "./components/layouts"
+import {
+  DataFlowDiagram,
+  HydrationVisual,
+  RenderTimeline,
+} from "./components/diagrams"
 
 // Available in every .mdx slide without an import
 const mdxComponents = {
   Columns,
+  DataFlowDiagram,
+  HydrationVisual,
+  RenderTimeline,
   DevObsessed,
   GradientText,
   Kicker,
@@ -79,12 +87,11 @@ export function App() {
   /** Whether the slide we're about to land on opens blank or fully revealed. */
   const entryRef = useRef<"start" | "end">("start")
 
-  /** Revealable elements are read from the DOM — bullets and standalone images. */
+  /** Revealable elements are read from the DOM — bullets, images, and any
+   *  element opting in with the `slide-reveal` class (diagram steps, etc.). */
   const bullets = useCallback(
     () =>
-      Array.from(
-        slideRef.current?.querySelectorAll("li, img.slide-reveal") ?? []
-      ),
+      Array.from(slideRef.current?.querySelectorAll("li, .slide-reveal") ?? []),
     []
   )
 
