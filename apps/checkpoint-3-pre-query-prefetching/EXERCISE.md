@@ -60,7 +60,8 @@ cache the route is about to read. No state to thread, no handoff.
 
 ## Not in this checkpoint
 
-This is still a client-only SPA — TanStack Start comes next. The dashboard
+This is still a client-only SPA — TanStack Start comes next (the conversion
+is done for you; checkpoint 4 is about picking rendering modes). The dashboard
 tables are hand-written HTML, and the Contact page has no form. The command
 palette and Casper aren't built yet — they arrive with the Hotkeys and AI
 checkpoints.

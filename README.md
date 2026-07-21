@@ -45,7 +45,7 @@ the **Demo login** button.
 | `pnpm dev:1` | `checkpoint-1-pre-dashboard` | **Router** — routes, layouts, typed search params | http://localhost:5551 |
 | `pnpm dev:2` | `checkpoint-2-pre-query` | **Query** — replace hand-rolled `useEffect` fetching | http://localhost:5552 |
 | `pnpm dev:3` | `checkpoint-3-pre-query-prefetching` | **Query** — prefetch on hover | http://localhost:5553 |
-| `pnpm dev:4` | `checkpoint-4-pre-start` | **Start** — SSR, prerendering, rendering modes | http://localhost:5554 |
+| `pnpm dev:4` | `checkpoint-4-pre-start` | **Start** — pick a rendering mode per page (+ RSC bonus) | http://localhost:5554 |
 | `pnpm dev:5` | `checkpoint-5-pre-table` | **Table** — three tables, sorting, row selection | http://localhost:5555 |
 | `pnpm dev:6` | `checkpoint-6-pre-virtual` | **Virtual** — infinite scroll + virtualized rows | http://localhost:5556 |
 | `pnpm dev:7` | `checkpoint-7-pre-form` | **Form** — the contact form, with zod | http://localhost:5557 |

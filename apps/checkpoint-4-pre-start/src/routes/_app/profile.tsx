@@ -55,6 +55,7 @@ async function updateProfile(userId: number, values: ProfileUpdate) {
 }
 
 export const Route = createFileRoute("/_app/profile")({
+  // TODO 2 — same ssr mode as the dashboard: personal to the signed-in user.
   component: ProfilePage,
 })
 

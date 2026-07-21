@@ -1,85 +1,56 @@
-# Checkpoint: TanStack Start
+# Checkpoint: TanStack Start — rendering modes
 
-Ghost Airlines is currently a **client-only SPA** — Vite serves an empty
-`<div id="root">` and JavaScript builds the whole page in the browser. Convert
-it to TanStack Start so it renders on the server, then choose the right
-rendering mode per route.
+The app is now a **TanStack Start** app — the conversion from a client-only
+SPA was done for you (see below). Right now every page uses the default:
+full server-side rendering. This checkpoint is about *choosing* a rendering
+mode per page instead of accepting one globally. It's deliberately the
+shortest exercise of the day.
 
 **Answer key:** `apps/checkpoint-5-pre-table` — but try it yourself first.
 
 ## Setup
 
 ```bash
-pnpm dev:server                            # json-server on :3300 (repo root)
-pnpm --filter checkpoint-4-pre-start dev     # this app on :5554
+pnpm dev:server                           # json-server on :3300 (repo root)
+pnpm --filter checkpoint-4-pre-start dev    # this app on :5554
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
 
-## See what you're fixing
+## New in this checkpoint
 
-```bash
-curl -s http://localhost:5554/ | grep -c "Low fares"
-```
+Everything that makes this a Start app instead of an SPA was scaffolded for
+you — worth five minutes of reading before the exercise:
 
-Zero. View source on the home page and you'll find an empty `<div id="root">`.
-Everything a search engine or a slow phone sees is a blank page until the JS
-bundle downloads, parses, and runs.
+- **`index.html` and `main.tsx` are gone.** The server renders the document
+  now: `src/routes/__root.tsx` gained a `shellComponent` with `<HeadContent>`
+  and `<Scripts>`, and `src/router.tsx` exports `getRouter()` for both the
+  server and the browser.
+- **Auth got better.** `lib/auth.ts` reads the session cookie with
+  `createIsomorphicFn()` — `getCookie()` on the server, `document.cookie` in
+  the browser — so the root route's `beforeLoad` guard runs server-side on
+  first load. A signed-out visitor is redirected before any dashboard JS
+  downloads. View source on `/` while signed in: the header has your name in
+  the HTML.
+- **One QueryClient per request** (`providers.tsx` creates it in `useState`)
+  so two users' server renders never share a cache.
 
 ## The exercise
 
-### 1. Install and swap the Vite plugin
+Two TODOs, both one-liners to write — the thinking is the point:
 
-```bash
-pnpm --filter checkpoint-4-pre-start add @tanstack/react-start
-```
+### TODO 1 — prerender the marketing pages (`vite.config.ts`)
 
-In `vite.config.ts`, replace `tanstackRouter({ ... })` with `tanstackStart()`.
-Start includes route generation, so the router plugin comes out.
-
-### 2. Give the app a server-rendered document
-
-Right now `index.html` is the document and `src/main.tsx` mounts React into it.
-Start renders the whole document from React instead:
-
-- Add a `shellComponent` to `src/routes/__root.tsx` that returns the real
-  `<html>`, `<head>`, and `<body>`.
-- Use `<HeadContent />` in the head and `<Scripts />` at the end of the body —
-  those are how Start injects meta tags and the client bundle.
-- Move the `<title>`, description, and the stylesheet into the root route's
-  `head: () => ({ meta: [...], links: [...] })`.
-- Move the theme `<script>` from `index.html` into the shell.
-- Delete `index.html` and `src/main.tsx` — Start owns the entry now.
-
-Keep `suppressHydrationWarning` on `<html>`: the theme script mutates the class
-list before React hydrates, and without it React complains every reload.
-
-### 3. Make session reading isomorphic
-
-`readSession()` in `src/lib/auth.ts` reads `document.cookie`. That's fine in a
-browser and *crashes* on a server. Start ships `createIsomorphicFn` for exactly
-this:
-
-```ts
-export const readSession = createIsomorphicFn()
-  .server(() => decodeSession(getCookie(SESSION_COOKIE)))
-  .client(() => sessionFromCookieHeader(document.cookie))
-```
-
-`getCookie` comes from `@tanstack/react-start/server`. This is what makes the
-`_app` auth guard run on the server — a signed-out visitor now gets redirected
-before any dashboard JavaScript is sent.
-
-### 4. Choose a rendering mode per route
-
-Not every page wants the same treatment.
-
-**Prerender the marketing pages.** `/` and `/about` are identical for every
-visitor and only change when you redeploy, so build them to static HTML:
+`/` and `/about` are identical for every visitor, so render them **once at
+build time**:
 
 ```ts
 tanstackStart({
-  prerender: { enabled: true, crawlLinks: false, autoStaticPathsDiscovery: false },
+  prerender: {
+    enabled: true,
+    crawlLinks: false,
+    autoStaticPathsDiscovery: false,
+  },
   pages: [
     { path: "/", prerender: { enabled: true } },
     { path: "/about", prerender: { enabled: true } },
@@ -87,46 +58,120 @@ tanstackStart({
 })
 ```
 
-⚠️ **Those two `false`s matter.** Both default to `true`. Leave them on, run
-`pnpm build`, and watch it prerender all ten pages — including `/dashboard` and
-`/profile`, baking one user's authenticated view into a static file that gets
-served to everyone. Try it once, look at the output, then turn them off.
+⚠️ **Both `false`s are load-bearing.** `crawlLinks` and
+`autoStaticPathsDiscovery` default to **true** — remove them, run
+`pnpm build`, and count the pages in `dist/client/`. The crawler follows the
+header's Dashboard link and bakes *authenticated, per-user pages into static
+files*. Put the `false`s back.
 
-**Use `ssr: 'data-only'` for the private pages.** Add it to the route options
-in `_app/dashboard.tsx` and `_app/profile.tsx`. Loaders and `beforeLoad` still
-run on the server (so the guard works), but no HTML for that subtree is sent.
-There's no point server-rendering a page that's different for every user and
-invisible to crawlers.
+Verify: `pnpm build`, then look at `dist/client/index.html` — your marketing
+page, fully rendered, no server needed.
 
-## Verify
+### TODO 2 — `data-only` for the authed pages
 
-```bash
-pnpm build
-```
-
-The prerender log should list exactly two pages. Then:
-
-```bash
-curl -s http://localhost:5554/ | grep -c "Low fares"          # now ≥ 1
-curl -s http://localhost:5554/dashboard | grep -c "Trips over time"   # still 0
-```
-
-The home page ships real HTML; the dashboard ships none. That's the whole
-lesson in two commands.
-
-## Note: TanStack Query and SSR
-
-Look at `src/components/providers.tsx`. The QueryClient is created inside a
-`useState` initializer, not as a module-level singleton:
+`src/routes/_app/dashboard.tsx` and `src/routes/_app/profile.tsx` are behind
+auth and personal to each user — server-rendering their *markup* buys
+nothing. Add:
 
 ```ts
-const [queryClient] = useState(() => new QueryClient({ ... }))
+ssr: "data-only",
 ```
 
-In a SPA it makes no difference. On a server it's essential — a module-level
-client would be shared across every concurrent request, leaking one user's
-cached data into another user's page. It was already written this way; now
-you know why.
+`data-only` still runs `beforeLoad` and loaders on the server (so the auth
+guard and redirect happen before any JS downloads) but ships no rendered HTML
+for the subtree.
+
+Verify: signed in, view source on `/dashboard` — the tab bar and stats are
+**not** in the HTML. View source on `/` — the hero **is**. Same app, three
+rendering modes: prerendered, full SSR (login, contact), and data-only.
+
+## Bonus — a React Server Component (experimental)
+
+RSC support in Start is experimental, and **the answer key does not include
+this one** — it's an experiment, so play and then revert. The setup is
+pre-installed (`@vitejs/plugin-rsc` is already in `package.json`).
+
+1. **Turn it on** in `vite.config.ts`:
+
+   ```ts
+   import rsc from "@vitejs/plugin-rsc"
+   // plugins: [..., tanstackStart({ ..., rsc: { enabled: true } }), rsc(), viteReact()]
+   ```
+
+2. **Write a server component** — `src/components/server-deals.tsx`. Note
+   what it is: an `async` function component that fetches directly. No
+   `useQuery`, no `useState` — it runs once, on the server, and the browser
+   receives its output instead of its code:
+
+   ```tsx
+   import { createServerFn } from "@tanstack/react-start"
+   import { renderServerComponent } from "@tanstack/react-start/rsc"
+
+   import type { Flight } from "@workspace/types"
+
+   import { API_URL } from "@/lib/api"
+
+   async function ServerDeals() {
+     let flights: Flight[] = []
+     try {
+       const res = await fetch(
+         `${API_URL}/flights?status=scheduled&_sort=price&_limit=3`
+       )
+       if (res.ok) flights = (await res.json()) as Flight[]
+     } catch {
+       // API down (e.g. building without json-server) — render nothing.
+     }
+     if (flights.length === 0) return null
+
+     return (
+       <div className="rounded-lg border bg-muted/40 p-4 text-sm">
+         <p className="mb-2 font-semibold">
+           Today&apos;s three cheapest fares{" "}
+           <span className="font-normal text-muted-foreground">
+             (rendered on the server — view source!)
+           </span>
+         </p>
+         <ul className="grid gap-1 sm:grid-cols-3">
+           {flights.map((f) => (
+             <li key={f.id} className="text-muted-foreground">
+               {f.originCode} → {f.destinationCode}{" "}
+               <span className="font-semibold text-brand">${f.price}</span>
+             </li>
+           ))}
+         </ul>
+       </div>
+     )
+   }
+
+   export const getServerDeals = createServerFn().handler(async () => {
+     const Renderable = await renderServerComponent(<ServerDeals />)
+     return { Renderable }
+   })
+   ```
+
+3. **Hand it to the home route** (`src/routes/_marketing/index.tsx`) — the
+   loader returns a *rendered subtree*, not data:
+
+   ```tsx
+   loader: async () => (await getServerDeals()).Renderable,
+   ```
+
+   and render it under the hero search card:
+
+   ```tsx
+   <div className="mt-4">{Route.useLoaderData()}</div>
+   ```
+
+Things to notice once it runs:
+
+- **View source**: the fares are in the HTML, but `ServerDeals` isn't in any
+  JS bundle the browser loads.
+- **With TODO 1 done**, `pnpm build` runs the server component at *build
+  time* — open `dist/client/index.html` and the fares are baked into the
+  static file. That's the whole rendering spectrum in one page: build-time
+  RSC inside a prerendered route.
+- The dev console warns about `optimizeDeps` inconsistencies — that's the
+  experimental part. Expected.
 
 ## Not in this checkpoint
 

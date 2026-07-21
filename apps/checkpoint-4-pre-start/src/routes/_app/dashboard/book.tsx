@@ -82,7 +82,8 @@ function BookPage() {
 
   const [page, setPage] = React.useState(0)
 
-  // No sorting yet — the sortable table arrives in a later checkpoint.
+  // No sorting yet — the API takes a sort spec, and the TanStack Table built
+  // in a later checkpoint is what will supply it. Default: departTime asc.
   const { data, isFetching, isLoading } = useQuery(
     flightsPageQuery(page, [], filters)
   )

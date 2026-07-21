@@ -15,7 +15,9 @@ function pressKey(key: string) {
 }
 
 function report(label: string) {
-  const items = Array.from(document.querySelectorAll("main li, main .slide-reveal"))
+  const items = Array.from(
+    document.querySelectorAll("main li, main .slide-reveal")
+  )
   const hidden = items.filter((el) => el.classList.contains("bullet-hidden"))
   console.log(
     `${label}: slide=${window.location.hash} items=${items.length} hidden=${hidden.length}`

@@ -24,6 +24,7 @@ const tabClass =
   "-mb-px border-b-2 border-transparent py-4 text-sm text-muted-foreground transition-colors hover:text-foreground data-[status=active]:border-primary data-[status=active]:font-medium data-[status=active]:text-foreground"
 
 export const Route = createFileRoute("/_app/dashboard")({
+  // TODO 2 — pick the right ssr mode for an authed, per-user subtree.
   component: DashboardLayout,
 })
 
