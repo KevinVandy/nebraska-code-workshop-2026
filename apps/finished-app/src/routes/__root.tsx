@@ -3,8 +3,13 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 import appCss from "@workspace/ui/globals.css?url"
 
 import { AppProviders } from "@/components/providers"
+import { readSession } from "@/lib/auth"
 
 export const Route = createRootRoute({
+  // Read the session cookie on every navigation — on the server for the
+  // initial document request, in the browser after that — and expose it to
+  // every route via router context. Child routes guard on `context.session`.
+  beforeLoad: () => ({ session: readSession() }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -33,6 +38,10 @@ export const Route = createRootRoute({
 const themeInit = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  // Seed React auth state from router context so the server render and the
+  // first client render agree (no signed-out flash, no hydration mismatch).
+  const { session } = Route.useRouteContext()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -40,7 +49,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body>
-        <AppProviders>{children}</AppProviders>
+        <AppProviders initialSession={session}>{children}</AppProviders>
         <Scripts />
       </body>
     </html>

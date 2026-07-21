@@ -88,7 +88,7 @@ function ContactPage() {
           ) : null}
           {send.isError ? (
             <p className="text-sm text-destructive">
-              {(send.error as Error).message}
+              {(send.error).message}
             </p>
           ) : null}
         </form>

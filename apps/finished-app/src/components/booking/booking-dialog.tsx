@@ -169,7 +169,7 @@ function BookingDialog({
 
             {book.isError ? (
               <p className="text-sm text-destructive">
-                {(book.error as Error).message}
+                {(book.error).message}
               </p>
             ) : null}
 

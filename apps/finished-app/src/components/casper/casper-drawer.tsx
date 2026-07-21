@@ -10,7 +10,8 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { applySearchFiltersToolDef, type FlightSummary } from "@/lib/ai-tools"
+import { applySearchFiltersToolDef } from "@/lib/ai-tools"
+import type { FlightSummary } from "@/lib/ai-tools"
 import { useAuth } from "../auth-context"
 import { useCasper } from "./casper-context"
 import { FlightOptionCard } from "./flight-option-card"
@@ -280,7 +281,7 @@ function Message({
     // Generative UI: flight search results as bookable cards
     if (part.name === "searchFlights" && part.output) {
       const output = part.output as {
-        flights: FlightSummary[]
+        flights?: FlightSummary[]
         totalMatching: number
       }
       if (!output.flights?.length) {

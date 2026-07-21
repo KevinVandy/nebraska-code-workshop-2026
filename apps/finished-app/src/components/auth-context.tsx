@@ -5,36 +5,34 @@ import type { User } from "@workspace/types"
 
 import {
   clearClientSession,
-  getClientSession,
   setClientSession,
-  sessionFromUser,
-  type Session,
+  sessionFromUser
+  
 } from "@/lib/auth"
+import type {Session} from "@/lib/auth";
 
-/* FAKE AUTH (see src/lib/auth.ts): this provider just mirrors an unsigned
- * cookie into React state. A real app would validate the session server-side. */
+/* The session is read isomorphically in the root route's `beforeLoad` (from
+ * the request cookie on the server, document.cookie in the browser) and handed
+ * to this provider, so the server render and hydration always agree. The FAKE
+ * part of auth is the cookie's unsigned contents — see src/lib/auth.ts. */
 
 interface AuthContextValue {
   session: Session | null
-  /** False until the cookie has been read on the client (avoids SSR mismatch). */
-  ready: boolean
   signIn: (user: User) => void
   signOut: () => void
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = React.useState<Session | null>(null)
-  const [ready, setReady] = React.useState(false)
+export function AuthProvider({
+  initialSession,
+  children,
+}: {
+  initialSession: Session | null
+  children: React.ReactNode
+}) {
+  const [session, setSession] = React.useState<Session | null>(initialSession)
   const queryClient = useQueryClient()
-
-  // Read the cookie after mount: the server render has no access to it, so
-  // starting as "logged out" and syncing here keeps hydration consistent.
-  React.useEffect(() => {
-    setSession(getClientSession())
-    setReady(true)
-  }, [])
 
   const signIn = React.useCallback((user: User) => {
     const next = sessionFromUser(user)
@@ -50,8 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient])
 
   const value = React.useMemo(
-    () => ({ session, ready, signIn, signOut }),
-    [session, ready, signIn, signOut]
+    () => ({ session, signIn, signOut }),
+    [session, signIn, signOut]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

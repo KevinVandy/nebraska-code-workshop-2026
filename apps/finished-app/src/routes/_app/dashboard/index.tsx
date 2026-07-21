@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createFileRoute } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createColumnHelper, useTable } from "@tanstack/react-table"
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
@@ -31,9 +31,9 @@ import {
   allTripsQuery,
   cancelTrip,
   currentUserQuery,
+  dealsQuery,
   upcomingTripsQuery,
 } from "@/lib/api"
-import { dashboardDeals } from "@/lib/placeholder"
 import { SortIndicator, dataTableFeatures } from "@/lib/table"
 
 export const Route = createFileRoute("/_app/dashboard/")({
@@ -66,6 +66,7 @@ function OverviewPage() {
   const user = useQuery(currentUserQuery(session?.userId))
   const upcoming = useQuery(upcomingTripsQuery(session?.userId))
   const allTrips = useQuery(allTripsQuery(session?.userId))
+  const deals = useQuery(dealsQuery)
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
 
   const cancel = useMutation({
@@ -243,15 +244,31 @@ function OverviewPage() {
             <CardTitle>Deals for you</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {dashboardDeals.map((deal) => (
-              <div
-                key={deal.route}
-                className="flex items-center justify-between rounded-lg bg-muted/40 px-4 py-3 text-sm"
+            {/* Live: the cheapest scheduled flight on each of 4 routes. Each
+              * deal links into Book a Flight with typed search params. */}
+            {(deals.data ?? []).map((flight) => (
+              <Link
+                key={flight.id}
+                to="/dashboard/book"
+                search={{ from: flight.originCode, to: flight.destinationCode }}
+                className="flex items-center justify-between rounded-lg bg-muted/40 px-4 py-3 text-sm hover:bg-muted"
               >
-                <span>{deal.route}</span>
-                <span className="font-semibold text-brand">${deal.price}</span>
-              </div>
+                <span>
+                  {flight.originCode} → {flight.destinationCode}
+                </span>
+                <span className="font-semibold text-brand">
+                  ${flight.price}
+                </span>
+              </Link>
             ))}
+            {deals.isPending
+              ? Array.from({ length: 4 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="h-11 animate-pulse rounded-lg bg-muted/40"
+                  />
+                ))
+              : null}
           </CardContent>
         </Card>
       </div>

@@ -18,8 +18,12 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { cn } from "@workspace/ui/lib/utils"
 import { useBooking } from "@/components/booking/booking-dialog"
-import { FLIGHTS_PAGE_SIZE, airportsQuery, fetchFlightsPage } from "@/lib/api"
-import type { FlightsPage } from "@/lib/api"
+import { PriceHistoryChart } from "@/components/price-history-chart"
+import {
+  airportsQuery,
+  flightsInfiniteQuery,
+  priceHistoryQuery,
+} from "@/lib/api"
 import { SortIndicator, dataTableFeatures } from "@/lib/table"
 
 // Filters live in the URL, so they're shareable/bookmarkable — and Casper's
@@ -61,6 +65,9 @@ function BookPage() {
   const filters = Route.useSearch()
   const navigate = Route.useNavigate()
 
+  // Only fetches once both endpoints of the route are chosen (enabled flag).
+  const priceHistory = useQuery(priceHistoryQuery(filters.from, filters.to))
+
   // Merge one filter into the URL (undefined removes the key).
   const setFilter = (key: "from" | "to" | "date" | "q", value: string) => {
     navigate({
@@ -76,7 +83,7 @@ function BookPage() {
   const [searchText, setSearchText] = React.useState(filters.q ?? "")
   const commitSearch = useDebouncedCallback(
     (value: string) => setFilter("q", value),
-    { wait: 400 },
+    { wait: 400 }
   )
 
   // Keep the input in sync when the URL changes from elsewhere (e.g. Casper's
@@ -141,15 +148,8 @@ function BookPage() {
   )
 
   const { data, fetchNextPage, isFetching, isLoading, hasNextPage } =
-    useInfiniteQuery<FlightsPage>({
-      queryKey: ["flights", "infinite", sorting, filters],
-      queryFn: ({ pageParam }) =>
-        fetchFlightsPage(pageParam as number, sorting, filters),
-      initialPageParam: 0,
-      getNextPageParam: (lastPage, pages) => {
-        const loaded = pages.length * FLIGHTS_PAGE_SIZE
-        return loaded < lastPage.meta.totalRowCount ? pages.length : undefined
-      },
+    useInfiniteQuery({
+      ...flightsInfiniteQuery(sorting, filters),
       placeholderData: keepPreviousData,
     })
 
@@ -283,6 +283,24 @@ function BookPage() {
           </p>
         </div>
       </Card>
+
+      {/* Route picked → show its 30-day price trend from /priceHistory. */}
+      {filters.from && filters.to && priceHistory.data?.length ? (
+        <Card className="p-5">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-sm font-semibold">
+              Price trend · {filters.from} → {filters.to}
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              30-day low{" "}
+              <span className="font-semibold text-brand">
+                ${Math.min(...priceHistory.data.map((p) => p.price))}
+              </span>
+            </p>
+          </div>
+          <PriceHistoryChart data={priceHistory.data} />
+        </Card>
+      ) : null}
 
       <Card className="overflow-hidden p-0">
         <div

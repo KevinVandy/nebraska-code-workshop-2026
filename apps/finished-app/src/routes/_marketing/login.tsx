@@ -92,11 +92,24 @@ function LoginPage() {
           </form.AppForm>
         </form>
 
-        {/* FAKE AUTH: demo credentials, shown because this is a workshop app. */}
-        <p className="mt-4 rounded-lg bg-muted/60 px-3 py-2 text-center text-xs text-muted-foreground">
-          Demo login — <span className="font-mono">demo@ghostair.com</span> /{" "}
-          <span className="font-mono">password</span>
-        </p>
+        {/* FAKE AUTH: one-click demo login so workshop attendees don't have to type. */}
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-4 w-full"
+          onClick={async () => {
+            setFormError(null)
+            const user = await verifyCredentials("jd@example.com", "Test1234")
+            if (!user) {
+              setFormError("Demo user not found — did you run pnpm seed?")
+              return
+            }
+            signIn(user)
+            navigate({ to: redirect ?? "/dashboard" })
+          }}
+        >
+          Demo login
+        </Button>
 
         <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
           <Separator className="flex-1" />

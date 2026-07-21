@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
+import type { Session } from "@/lib/auth"
+
 import { AuthProvider } from "./auth-context"
 import { BookingProvider } from "./booking/booking-dialog"
 import { CasperProvider } from "./casper/casper-context"
@@ -12,7 +14,13 @@ import { ShortcutsProvider } from "./shortcuts/shortcuts-provider"
  * App-wide providers. Casper lives here (rather than in the dashboard layout)
  * so the assistant is reachable from any page once you're signed in.
  */
-export function AppProviders({ children }: { children: React.ReactNode }) {
+export function AppProviders({
+  initialSession,
+  children,
+}: {
+  initialSession: Session | null
+  children: React.ReactNode
+}) {
   // A fresh client per render tree: once on the client, per-request on the server.
   const [queryClient] = useState(
     () =>
@@ -28,7 +36,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <AuthProvider initialSession={initialSession}>
         <BookingProvider>
           <CasperProvider>
             {/* Shortcuts live inside Casper's provider so ⌘J can toggle it. */}

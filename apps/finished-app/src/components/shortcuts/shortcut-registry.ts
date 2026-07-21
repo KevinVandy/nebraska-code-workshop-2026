@@ -30,7 +30,8 @@ export const SHORTCUTS: ShortcutDef[] = [
 /** Render a hotkey string for display, e.g. "Mod+K" → "⌘ K" / "Ctrl K". */
 export function formatHotkey(hotkey: string): string {
   const isMac =
-    typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform)
+    typeof navigator !== "undefined" &&
+    /Mac|iPhone|iPad/.test(navigator.platform)
   return hotkey
     .split("+")
     .map((part) => {

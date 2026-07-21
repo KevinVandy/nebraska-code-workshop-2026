@@ -16,7 +16,8 @@ const ShortcutsContext = React.createContext<ShortcutsContextValue | null>(null)
 
 export function useShortcuts() {
   const ctx = React.useContext(ShortcutsContext)
-  if (!ctx) throw new Error("useShortcuts must be used within ShortcutsProvider")
+  if (!ctx)
+    throw new Error("useShortcuts must be used within ShortcutsProvider")
   return ctx
 }
 
@@ -34,47 +35,75 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 
   const enabled = Boolean(session)
 
-  useHotkey("Mod+K", (e) => {
-    e.preventDefault()
-    setPaletteOpen((open) => !open)
-  }, { enabled })
+  useHotkey(
+    "Mod+K",
+    (e) => {
+      e.preventDefault()
+      setPaletteOpen((open) => !open)
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+J", (e) => {
-    e.preventDefault()
-    toggleCasper()
-  }, { enabled })
+  useHotkey(
+    "Mod+J",
+    (e) => {
+      e.preventDefault()
+      toggleCasper()
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+/", (e) => {
-    e.preventDefault()
-    setCheatSheetOpen((open) => !open)
-  }, { enabled })
+  useHotkey(
+    "Mod+/",
+    (e) => {
+      e.preventDefault()
+      setCheatSheetOpen((open) => !open)
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+1", (e) => {
-    e.preventDefault()
-    navigate({ to: "/dashboard" })
-  }, { enabled })
+  useHotkey(
+    "Mod+1",
+    (e) => {
+      e.preventDefault()
+      navigate({ to: "/dashboard" })
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+2", (e) => {
-    e.preventDefault()
-    navigate({ to: "/dashboard/book" })
-  }, { enabled })
+  useHotkey(
+    "Mod+2",
+    (e) => {
+      e.preventDefault()
+      navigate({ to: "/dashboard/book" })
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+3", (e) => {
-    e.preventDefault()
-    navigate({ to: "/dashboard/status" })
-  }, { enabled })
+  useHotkey(
+    "Mod+3",
+    (e) => {
+      e.preventDefault()
+      navigate({ to: "/dashboard/status" })
+    },
+    { enabled }
+  )
 
-  useHotkey("Mod+P", (e) => {
-    e.preventDefault()
-    navigate({ to: "/profile" })
-  }, { enabled })
+  useHotkey(
+    "Mod+P",
+    (e) => {
+      e.preventDefault()
+      navigate({ to: "/profile" })
+    },
+    { enabled }
+  )
 
   const value = React.useMemo(
     () => ({
       openPalette: () => setPaletteOpen(true),
       openCheatSheet: () => setCheatSheetOpen(true),
     }),
-    [],
+    []
   )
 
   return (

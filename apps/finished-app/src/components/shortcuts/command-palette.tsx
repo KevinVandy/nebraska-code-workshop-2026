@@ -4,7 +4,11 @@ import { useQuery } from "@tanstack/react-query"
 import { useDebouncedCallback } from "@tanstack/react-pacer"
 import { Keyboard, Plane, Search, User } from "lucide-react"
 
-import { Dialog, DialogContent, DialogTitle } from "@workspace/ui/components/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@workspace/ui/components/dialog"
 import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -104,7 +108,10 @@ export function CommandPalette({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="top-24 max-w-lg translate-y-0 gap-0 p-0" showCloseButton={false}>
+      <DialogContent
+        className="top-24 max-w-lg translate-y-0 gap-0 p-0"
+        showCloseButton={false}
+      >
         <DialogTitle className="sr-only">Command palette</DialogTitle>
 
         <div className="flex items-center gap-2 border-b px-4 py-3">
@@ -170,7 +177,13 @@ export function CommandPalette({
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string
+  children: React.ReactNode
+}) {
   return (
     <div className="mb-2">
       <p className="px-3 py-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
@@ -198,7 +211,7 @@ function Row({
       onClick={onSelect}
       className={cn(
         "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm",
-        "hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+        "hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
       )}
     >
       <span className="text-muted-foreground">{icon}</span>

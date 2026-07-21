@@ -1,4 +1,10 @@
-import { useEffect, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react"
 import { MDXProvider } from "@mdx-js/react"
 import { useHotkey } from "@tanstack/react-hotkeys"
 import { slides } from "./slides"
@@ -25,6 +31,12 @@ const mdxComponents = {
   SectionSlide,
   TheStack,
   TitleSlide,
+  img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
+    <img {...props} className={`slide-reveal ${props.className ?? ""}`} />
+  ),
+  a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a {...props} target="_blank" rel="noopener noreferrer" />
+  ),
 }
 
 function slideFromHash(): number {
@@ -35,11 +47,58 @@ function slideFromHash(): number {
 
 export function App() {
   const [index, setIndex] = useState(slideFromHash)
+  /** How many bullets on the current slide are revealed. */
+  const [step, setStep] = useState(0)
+  const slideRef = useRef<HTMLElement>(null)
+  /** Whether the slide we're about to land on opens blank or fully revealed. */
+  const entryRef = useRef<"start" | "end">("start")
 
-  const goTo = (i: number) =>
-    setIndex(Math.min(Math.max(i, 0), slides.length - 1))
-  const next = () => goTo(index + 1)
-  const prev = () => goTo(index - 1)
+  /** Revealable elements are read from the DOM — bullets and standalone images. */
+  const bullets = useCallback(
+    () =>
+      Array.from(
+        slideRef.current?.querySelectorAll("li, img.slide-reveal") ?? []
+      ),
+    []
+  )
+
+  const goTo = useCallback(
+    (i: number, entry: "start" | "end" = "start") => {
+      const clamped = Math.min(Math.max(i, 0), slides.length - 1)
+      if (clamped === index) return
+      entryRef.current = entry
+      setIndex(clamped)
+    },
+    [index]
+  )
+
+  // Right/Space walk the bullets first, then move on to the next slide.
+  // Kept free of setState updaters so StrictMode's double-invoke can't
+  // fire the slide change twice. useHotkey re-syncs the callback every
+  // render, so `step` is never stale here.
+  const next = useCallback(() => {
+    if (step < bullets().length) setStep(step + 1)
+    else goTo(index + 1, "start")
+  }, [bullets, goTo, index, step])
+
+  // Left rewinds bullets, then backs into the previous slide fully revealed.
+  const prev = useCallback(() => {
+    if (step > 0) setStep(step - 1)
+    else goTo(index - 1, "end")
+  }, [goTo, index, step])
+
+  // On landing, open blank (forward) or fully revealed (backward).
+  useLayoutEffect(() => {
+    setStep(entryRef.current === "end" ? bullets().length : 0)
+    entryRef.current = "start"
+  }, [index, bullets])
+
+  // Reflect the current step onto the DOM after every render.
+  useLayoutEffect(() => {
+    bullets().forEach((li, i) =>
+      li.classList.toggle("bullet-hidden", i >= step)
+    )
+  })
 
   // Keep the URL hash in sync so refresh/deep-links land on the same slide
   useEffect(() => {
@@ -55,8 +114,13 @@ export function App() {
   useHotkey("ArrowRight", next)
   useHotkey("ArrowLeft", prev)
   useHotkey("Space", next)
+  // Up/Down always jump whole slides, regardless of bullet state.
+  useHotkey("ArrowDown", () => goTo(index + 1, "start"))
+  useHotkey("ArrowUp", () => goTo(index - 1, "start"))
   useHotkey("Home", () => goTo(0))
   useHotkey("End", () => goTo(slides.length - 1))
+  useHotkey(".", () => setStep(bullets().length))
+  useHotkey(",", () => setStep(0))
   useHotkey("F", () => {
     if (document.fullscreenElement) void document.exitFullscreen()
     else void document.documentElement.requestFullscreen()
@@ -66,7 +130,10 @@ export function App() {
 
   return (
     <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100">
-      <main className="slide flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-[8vw] py-[6vh]">
+      <main
+        ref={slideRef}
+        className="slide flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-[8vw] py-[6vh]"
+      >
         <MDXProvider components={mdxComponents}>
           <Slide />
         </MDXProvider>

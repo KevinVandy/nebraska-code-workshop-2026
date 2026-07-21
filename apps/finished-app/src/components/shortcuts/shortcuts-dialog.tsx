@@ -23,7 +23,8 @@ export function ShortcutsDialog({
         <DialogHeader>
           <DialogTitle>Keyboard shortcuts</DialogTitle>
           <DialogDescription>
-            Powered by TanStack Hotkeys — <code>Mod</code> is ⌘ on macOS and Ctrl elsewhere.
+            Powered by TanStack Hotkeys — <code>Mod</code> is ⌘ on macOS and
+            Ctrl elsewhere.
           </DialogDescription>
         </DialogHeader>
 
@@ -39,7 +40,9 @@ export function ShortcutsDialog({
                     key={shortcut.hotkey}
                     className="flex items-center justify-between gap-4 text-sm"
                   >
-                    <span className="text-muted-foreground">{shortcut.label}</span>
+                    <span className="text-muted-foreground">
+                      {shortcut.label}
+                    </span>
                     <kbd className="rounded border bg-muted px-2 py-0.5 font-mono text-xs whitespace-nowrap">
                       {shortcut.display ?? formatHotkey(shortcut.hotkey)}
                     </kbd>

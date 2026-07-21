@@ -148,21 +148,39 @@ function generateTrips(flights) {
       bookedAt: addMinutes(now, -faker.number.int({ min: 1, max: 30 }) * DAY).toISOString(),
     })
   }
-  // ~40 completed trips over the last 12 months (feed the "Trips over time" bar chart).
-  for (let k = 0; k < 40; k++) {
-    const f = faker.helpers.arrayElement(flights)
-    trips.push({
-      id: id++,
-      userId: 1,
-      flightId: f.id,
-      bookingRef: faker.string.alphanumeric({ length: 6, casing: 'upper' }),
-      status: 'completed',
-      bookingStatus: 'confirmed',
-      seat: seat(),
-      cabin: f.cabin,
-      passengers: faker.number.int({ min: 1, max: 3 }),
-      bookedAt: addMinutes(now, -faker.number.int({ min: 20, max: 365 }) * DAY).toISOString(),
-    })
+  // Completed trips over the last 12 months (feed the "Trips over time" chart).
+  //
+  // Deliberately bucketed PER MONTH rather than spread uniformly across 365
+  // days: a uniform spread averages out to a nearly flat bar for every month,
+  // which makes the chart look like noise. Drawing a weighted count per month
+  // gives quiet months, empty months, and the occasional travel-heavy spike —
+  // a shape worth actually charting.
+  const monthlyTripCount = [
+    { value: 0, weight: 3 },
+    { value: 1, weight: 4 },
+    { value: 2, weight: 4 },
+    { value: 3, weight: 2 },
+    { value: 5, weight: 1 }, // rare busy month
+  ]
+  for (let monthsAgo = 1; monthsAgo <= 12; monthsAgo++) {
+    const count = faker.helpers.weightedArrayElement(monthlyTripCount)
+    for (let k = 0; k < count; k++) {
+      const f = faker.helpers.arrayElement(flights)
+      // Land somewhere inside that month rather than on a boundary.
+      const daysAgo = monthsAgo * 30 - faker.number.int({ min: 0, max: 29 })
+      trips.push({
+        id: id++,
+        userId: 1,
+        flightId: f.id,
+        bookingRef: faker.string.alphanumeric({ length: 6, casing: 'upper' }),
+        status: 'completed',
+        bookingStatus: 'confirmed',
+        seat: seat(),
+        cabin: f.cabin,
+        passengers: faker.number.int({ min: 1, max: 3 }),
+        bookedAt: addMinutes(now, -daysAgo * DAY).toISOString(),
+      })
+    }
   }
   return trips
 }
@@ -170,9 +188,11 @@ function generateTrips(flights) {
 function generateUsers() {
   const demo = {
     id: 1,
-    name: 'Morticia Graves',
-    email: 'demo@ghostair.com',
-    password: 'password',
+    name: 'John Doe',
+    email: 'jd@example.com',
+    password: 'Test1234',
+    phone: '555-867-5309',
+    homeAirport: 'SLM',
     avatar: faker.image.avatar(),
     memberSince: addMinutes(now, -faker.number.int({ min: 400, max: 1200 }) * DAY).toISOString(),
     tier: 'Gold',
@@ -220,7 +240,8 @@ function generate() {
   console.log(
     `   airports:${airports.length} flights:${flights.length} priceHistory:${priceHistory.length} trips:${trips.length} users:${users.length}`,
   )
-  console.log(`   Demo login → demo@ghostair.com / password`)
+  console.log(`   Demo login → jd@example.com / Test1234`)
+  console.log(`   ⚠️  json-server loads db.json at startup — restart the API server (pnpm dev:server) to pick this up.`)
 }
 
 generate()

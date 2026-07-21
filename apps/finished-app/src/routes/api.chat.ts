@@ -14,6 +14,7 @@ import {
   applySearchFiltersToolDef,
   bookFlightToolDef,
   cancelTripToolDef,
+  getFlightStatusToolDef,
   getMyTripsToolDef,
   searchFlightsToolDef,
 } from "@/lib/ai-tools"
@@ -25,8 +26,15 @@ const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o"
 
 const SYSTEM_PROMPT = `You are Casper, the friendly concierge for Ghost Airlines — a budget airline flying to small, storied towns (Salem, Sleepy Hollow, Transylvania, Roswell, Amityville, Loch Ness, Savannah, New Orleans, Tombstone, Point Pleasant).
 
+TWO DIFFERENT KINDS OF "STATUS" — never confuse these:
+- flightStatus (on-time | delayed | cancelled | scheduled) describes the AIRCRAFT. Get it from getFlightStatus, or from the flightStatus field on getMyTrips.
+- bookingStatus (confirmed | pending) describes the RESERVATION. It says nothing about whether the plane is flying.
+A booking can be "confirmed" on a flight that is "cancelled". If the user asks whether a flight is on time, delayed, or cancelled, you MUST call getFlightStatus — never answer from bookingStatus. If the user says the app shows a different status than you reported, believe them and call getFlightStatus to check; do not tell them to contact customer service.
+
 WORKFLOW RULES:
 - To answer questions about flights, ALWAYS call searchFlights first. Never invent flights.
+- searchFlights only returns bookable (scheduled) flights, so it will NOT surface today's delayed or cancelled departures. Use getFlightStatus for those.
+- The user may ask about a flight by number (e.g. "GA-1288") that they saw on the departures board. Pass that number straight to getFlightStatus.
 - When the user asks to book, call bookFlight with the flight id from searchFlights. The user will be asked to approve it — never claim a booking succeeded unless the tool returned a bookingRef.
 - The searchFlights results are displayed to the user as rich cards, so do NOT repeat the flight list in text. Add at most one short sentence after the tool call.
 - To answer questions about the user's trips, call getMyTrips.
@@ -74,8 +82,45 @@ const searchFlights = searchFlightsToolDef.server(async (input) => {
       stops: f.stops,
       price: f.price,
       seatsLeft: f.seatsLeft,
+      status: f.status,
     })),
     totalMatching: all.length,
+  }
+})
+
+/**
+ * Operational status lookup. Deliberately does NOT filter by status — unlike
+ * searchFlights (which only returns bookable `scheduled` flights), this has to
+ * be able to find today's delayed and cancelled departures.
+ */
+const getFlightStatus = getFlightStatusToolDef.server(async (input) => {
+  const params = new URLSearchParams()
+  if (input.flightId != null) params.set("id", String(input.flightId))
+  if (input.flightNumber) {
+    // Users say "GA-1288"; be forgiving about case and a missing dash.
+    const raw = input.flightNumber.trim().toUpperCase().replace(/\s+/g, "")
+    params.set(
+      "flightNumber",
+      raw.startsWith("GA-") ? raw : `GA-${raw.replace(/^GA/, "")}`
+    )
+  }
+  if ([...params].length === 0) {
+    throw new Error("Provide either a flightNumber or a flightId.")
+  }
+
+  const matches = await apiJson<Flight[]>(`/flights?${params.toString()}`)
+  return {
+    flights: matches.map((f) => ({
+      id: f.id,
+      flightNumber: f.flightNumber,
+      originCode: f.originCode,
+      destinationCode: f.destinationCode,
+      departTime: f.departTime,
+      arriveTime: f.arriveTime,
+      status: f.status,
+      gate: f.gate,
+      terminal: f.terminal,
+    })),
   }
 })
 
@@ -98,7 +143,8 @@ const getMyTrips = getMyTripsToolDef.server<CasperContext>(
           flightNumber: t.flight.flightNumber,
           route: routeLabel(t.flight),
           departTime: t.flight.departTime,
-          bookingStatus: t.bookingStatus,
+          bookingStatus: t.bookingStatus, // the reservation
+          flightStatus: t.flight.status, // the aircraft
           price: t.flight.price,
         })),
     }
@@ -156,6 +202,7 @@ const cancelTrip = cancelTripToolDef.server<CasperContext>(
 
 const serverTools = [
   searchFlights,
+  getFlightStatus,
   getMyTrips,
   bookFlight,
   cancelTrip,

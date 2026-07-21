@@ -1,24 +1,51 @@
-import { tripsOverTime } from "@/lib/placeholder"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts"
+
+import { ChartTooltip } from "./chart-tooltip"
 
 export type ChartPoint = { month: string; value: number }
 
-// Simple bar chart (plain divs) matching the mockup. A later phase can swap this
-// for a shadcn/Recharts chart. Defaults to placeholder data when none is passed.
-export function TripsChart({ data = tripsOverTime }: { data?: ChartPoint[] }) {
-  const max = Math.max(1, ...data.map((d) => d.value))
-
+export function TripsChart({ data }: { data: ChartPoint[] }) {
   return (
-    <div className="flex h-56 items-end justify-between gap-2">
-      {data.map((d) => (
-        <div key={d.month} className="flex flex-1 flex-col items-center gap-2">
-          <span className="text-xs text-muted-foreground">{d.value}</span>
-          <div
-            className="w-full rounded-t bg-chart-1"
-            style={{ height: `${(d.value / max) * 100}%` }}
+    <div className="h-56">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 8, right: 4, left: 4, bottom: 0 }}>
+          <CartesianGrid
+            vertical={false}
+            stroke="var(--border)"
+            strokeDasharray="3 3"
           />
-          <span className="text-xs text-muted-foreground">{d.month}</span>
-        </div>
-      ))}
+          <XAxis
+            dataKey="month"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+            dy={4}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)", opacity: 0.4 }}
+            content={
+              <ChartTooltip
+                formatValue={(v) => `${v} trip${v === 1 ? "" : "s"}`}
+              />
+            }
+          />
+          {/* --brand rather than the pale primary yellow: it keeps ≥3:1
+            * contrast against the card surface in BOTH light and dark mode. */}
+          <Bar
+            dataKey="value"
+            fill="var(--brand)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={32}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   )
 }

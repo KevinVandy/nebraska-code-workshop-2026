@@ -7,7 +7,13 @@ import rehypeHighlight from "rehype-highlight"
 export default defineConfig({
   plugins: [
     // MDX must transform before the React plugin sees the file
-    { enforce: "pre", ...mdx({ providerImportSource: "@mdx-js/react", rehypePlugins: [rehypeHighlight] }) },
+    {
+      enforce: "pre",
+      ...mdx({
+        providerImportSource: "@mdx-js/react",
+        rehypePlugins: [rehypeHighlight],
+      }),
+    },
     viteReact({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
     tailwindcss(),
   ],

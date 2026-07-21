@@ -70,6 +70,48 @@ export function DevObsessed({ link = true }: { link?: boolean }) {
   )
 }
 
+/** Every library, in brand colors, scrolling horizontally forever. */
+export const LIBRARY_ORDER: Array<LibraryId> = [
+  "query",
+  "router",
+  "start",
+  "table",
+  "virtual",
+  "form",
+  "store",
+  "pacer",
+  "hotkeys",
+  "db",
+  "ai",
+  "intent",
+]
+
+function LibraryMarquee() {
+  // The track holds two identical copies and slides exactly -50%, so the
+  // second copy lands where the first began — a seamless loop.
+  const copies = [0, 1]
+  return (
+    <div className="marquee-mask -mx-[8vw] mt-32 overflow-hidden opacity-50">
+      <div className="marquee-track flex w-max items-center gap-10">
+        {copies.map((copy) =>
+          LIBRARY_ORDER.map((id) => {
+            const { name, color } = libraries[id]
+            return (
+              <span
+                key={`${copy}-${id}`}
+                className="marquee-item font-extrabold tracking-tight whitespace-nowrap uppercase"
+                style={{ color }}
+              >
+                {name}
+              </span>
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
+}
+
 /**
  * Opening slide — title, photo, and speaker credit. Deliberately sparse:
  * the deck's own agenda slides carry the detail.
@@ -81,6 +123,7 @@ export function TitleSlide({
   speaker,
   speakerTitle,
   photo = "/profile.jpg",
+  marquee = true,
 }: {
   kicker?: ReactNode
   title: ReactNode
@@ -88,6 +131,8 @@ export function TitleSlide({
   speaker: string
   speakerTitle?: ReactNode
   photo?: string
+  /** Scrolling library strip under the tagline. */
+  marquee?: boolean
 }) {
   return (
     <FullBleed className="bg-zinc-950">
@@ -109,6 +154,8 @@ export function TitleSlide({
             {tagline}
           </p>
         )}
+
+        {marquee && <LibraryMarquee />}
       </div>
 
       <div className="relative flex items-center gap-6 border-t border-zinc-800 pt-6">
@@ -210,7 +257,7 @@ export function Columns({ children }: { children: ReactNode }) {
 /** Bordered callout for asides, caveats, or a punchline. */
 export function Note({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-8 rounded-lg border border-zinc-800 border-l-4 border-l-orange-500 bg-zinc-900/60 px-6 py-4 text-zinc-400">
+    <div className="mt-8 rounded-lg border border-l-4 border-zinc-800 border-l-orange-500 bg-zinc-900/60 px-6 py-4 text-zinc-400">
       {children}
     </div>
   )
@@ -222,8 +269,18 @@ export function Note({ children }: { children: ReactNode }) {
  */
 export function TheStack() {
   const order: Array<LibraryId> = [
-    "query", "router", "start", "table", "virtual",
-    "form", "store", "pacer", "hotkeys", "db", "ai", "intent",
+    "query",
+    "router",
+    "start",
+    "table",
+    "virtual",
+    "form",
+    "store",
+    "pacer",
+    "hotkeys",
+    "db",
+    "ai",
+    "intent",
   ]
   return (
     <FullBleed className="bg-zinc-950">
@@ -242,10 +299,7 @@ export function TheStack() {
           {order.map((id) => {
             const { name, color } = libraries[id]
             return (
-              <div
-                key={id}
-                className="flex items-baseline gap-3 leading-tight"
-              >
+              <div key={id} className="flex items-baseline gap-3 leading-tight">
                 <span
                   className="library-badge shrink-0 rounded-md px-2 py-0.5 font-black tracking-widest text-zinc-950 uppercase"
                   style={{ backgroundColor: color }}
@@ -253,7 +307,7 @@ export function TheStack() {
                   TanStack
                 </span>
                 <span
-                  className="min-w-0 truncate text-[2.4vw] font-extrabold uppercase tracking-tight"
+                  className="min-w-0 truncate text-[2.4vw] font-extrabold tracking-tight uppercase"
                   style={{ color }}
                 >
                   {name}

@@ -5,6 +5,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:finished": "turbo run dev --filter=finished-app",
+    "dev:slides": "turbo run dev --filter=slides",
+    "dev:server": "turbo run dev --filter=api",
     "lint": "turbo run lint",
     "format": "turbo run format",
     "typecheck": "turbo run typecheck",

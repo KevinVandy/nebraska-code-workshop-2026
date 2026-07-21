@@ -213,7 +213,7 @@ function ProfileForm({
           ) : null}
           {save.isError ? (
             <span className="text-sm text-destructive">
-              {(save.error as Error).message}
+              {(save.error).message}
             </span>
           ) : null}
         </div>
