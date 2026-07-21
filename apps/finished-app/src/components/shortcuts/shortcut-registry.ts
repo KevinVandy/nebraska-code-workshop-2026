@@ -1,16 +1,16 @@
 /**
- * Single source of truth for the app's hotkeys.
+ * DISPLAY data for the cheat-sheet dialog. The actual registrations are the
+ * seven inline `useHotkey` calls in shortcuts-provider.tsx — those ARE the
+ * TanStack Hotkeys lesson, so they stay written out one by one. If you add a
+ * hotkey there, add its row here too.
  *
- * `Mod` is platform-adaptive in TanStack Hotkeys: ⌘ on macOS, Ctrl elsewhere —
- * so the cheat-sheet and the registrations can't drift apart.
+ * `Mod` is platform-adaptive in TanStack Hotkeys: ⌘ on macOS, Ctrl elsewhere.
  */
 export interface ShortcutDef {
   /** TanStack Hotkeys registration string. */
   hotkey: string
   /** How it reads in the cheat-sheet. */
   label: string
-  /** Optional override for how the key combo is displayed (e.g. "?"). */
-  display?: string
   group: "Navigation" | "Actions"
 }
 
@@ -29,6 +29,8 @@ export const SHORTCUTS: ShortcutDef[] = [
 
 /** Render a hotkey string for display, e.g. "Mod+K" → "⌘ K" / "Ctrl K". */
 export function formatHotkey(hotkey: string): string {
+  // navigator.platform is deprecated but remains the pragmatic Mac sniff for
+  // choosing display glyphs (the hotkeys themselves don't rely on it).
   const isMac =
     typeof navigator !== "undefined" &&
     /Mac|iPhone|iPad/.test(navigator.platform)

@@ -26,6 +26,7 @@ const SUGGESTIONS = [
 
 const WORKING_LABELS: Record<string, string> = {
   searchFlights: "Searching flights…",
+  getFlightStatus: "Checking flight status…",
   getMyTrips: "Checking your trips…",
   bookFlight: "Preparing your booking…",
   cancelTrip: "Preparing the cancellation…",
@@ -67,11 +68,17 @@ export function CasperDrawer() {
     [navigate]
   )
 
-  const { messages, sendMessage, isLoading, error, addToolApprovalResponse } =
-    useChat({
-      connection: fetchServerSentEvents("/api/chat"),
-      tools,
-    })
+  const {
+    messages,
+    sendMessage,
+    stop,
+    isLoading,
+    error,
+    addToolApprovalResponse,
+  } = useChat({
+    connection: fetchServerSentEvents("/api/chat"),
+    tools,
+  })
 
   // When a booking/cancellation tool completes, refetch trips + flights so the
   // dashboard behind the drawer updates live.
@@ -177,7 +184,17 @@ export function CasperDrawer() {
         )}
 
         {isLoading ? (
-          <p className="text-xs text-muted-foreground">Casper is thinking…</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground">Casper is thinking…</p>
+            {/* Escape hatch: a stalled stream shouldn't freeze the drawer. */}
+            <button
+              type="button"
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+              onClick={() => stop()}
+            >
+              Stop
+            </button>
+          </div>
         ) : null}
         {error ? (
           <p className="text-xs text-destructive">
@@ -213,6 +230,15 @@ export function CasperDrawer() {
   )
 }
 
+/**
+ * One chat message. Text parts render as bubbles; tool-call parts render as
+ * generative UI — each tool gets its own small component below, so this reads
+ * as a table of contents for what Casper can show.
+ *
+ * The `part.output as …` casts mirror each tool's `outputSchema` in
+ * src/lib/ai-tools.ts — the server validated the shape; the stream types it
+ * as unknown.
+ */
 function Message({
   message,
   onBookFlight,
@@ -245,132 +271,35 @@ function Message({
 
     // Approval gate (bookFlight / cancelTrip)
     if (part.state === "approval-requested" && part.approval) {
-      const args = parseArgs(part)
       return (
-        <div
-          key={part.id}
-          className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-500/40 dark:bg-amber-500/10"
-        >
-          <p className="font-medium">
-            {part.name === "bookFlight"
-              ? "Approve this booking?"
-              : "Approve this cancellation?"}
-          </p>
-          <pre className="overflow-x-auto rounded-lg bg-background p-2 text-xs">
-            {JSON.stringify(args, null, 2)}
-          </pre>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => onApproval(part.approval!.id, true)}
-            >
-              Approve
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onApproval(part.approval!.id, false)}
-            >
-              Deny
-            </Button>
-          </div>
-        </div>
+        <ApprovalRequest key={part.id} part={part} onApproval={onApproval} />
       )
     }
 
-    // Generative UI: flight search results as bookable cards
     if (part.name === "searchFlights" && part.output) {
-      const output = part.output as {
-        flights?: FlightSummary[]
-        totalMatching: number
-      }
-      if (!output.flights?.length) {
-        return (
-          <p key={part.id} className="text-sm text-muted-foreground">
-            No flights matched that search.
-          </p>
-        )
-      }
       return (
-        <div key={part.id} className="space-y-2">
-          {output.flights.map((flight) => (
-            <FlightOptionCard
-              key={flight.id}
-              flight={flight}
-              onBook={onBookFlight}
-              disabled={busy}
-            />
-          ))}
-          {output.totalMatching > output.flights.length ? (
-            <p className="text-xs text-muted-foreground">
-              Showing {output.flights.length} of {output.totalMatching} matching
-              flights.
-            </p>
-          ) : null}
-        </div>
-      )
-    }
-
-    // Booking confirmation
-    if (part.name === "bookFlight" && part.output) {
-      const output = part.output as {
-        bookingRef: string
-        flightNumber: string
-        route: string
-        price: number
-      }
-      return (
-        <div
+        <SearchResults
           key={part.id}
-          className="rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm dark:border-emerald-500/40 dark:bg-emerald-500/10"
-        >
-          <p className="font-medium">Booked! ✈️</p>
-          <p className="text-muted-foreground">
-            {output.flightNumber} · {output.route} · ${output.price}
-          </p>
-          <p className="mt-1 text-xs">
-            Confirmation{" "}
-            <span className="font-mono font-semibold">{output.bookingRef}</span>
-          </p>
-        </div>
+          output={part.output as SearchResultsOutput}
+          onBookFlight={onBookFlight}
+          busy={busy}
+        />
       )
     }
 
-    // Trips list
-    if (part.name === "getMyTrips" && part.output) {
-      const output = part.output as {
-        trips: Array<{
-          tripId: number
-          flightNumber: string
-          route: string
-          departTime: string
-          bookingStatus: string
-          price: number
-        }>
-      }
+    if (part.name === "bookFlight" && part.output) {
       return (
-        <div key={part.id} className="space-y-1.5">
-          {output.trips.map((trip) => (
-            <div
-              key={trip.tripId}
-              className="flex items-center justify-between rounded-lg border bg-card px-3 py-2 text-sm"
-            >
-              <span className="font-medium">{trip.flightNumber}</span>
-              <span className="text-muted-foreground">{trip.route}</span>
-              <span className="text-muted-foreground">
-                {new Date(trip.departTime).toLocaleDateString([], {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-              <span className="font-medium text-brand">${trip.price}</span>
-            </div>
-          ))}
-        </div>
+        <BookingConfirmation
+          key={part.id}
+          output={part.output as BookingOutput}
+        />
       )
     }
 
-    // Filters applied to the Book tab
+    if (part.name === "getMyTrips" && part.output) {
+      return <TripsList key={part.id} output={part.output as TripsOutput} />
+    }
+
     if (part.name === "applySearchFilters" && part.output) {
       return (
         <p key={part.id} className="text-xs text-muted-foreground">
@@ -379,7 +308,8 @@ function Message({
       )
     }
 
-    // In-flight tool call
+    // Any tool still running (including getFlightStatus, whose result Casper
+    // relays as plain text rather than a card).
     if (!part.output) {
       return (
         <p key={part.id} className="text-xs text-muted-foreground">
@@ -394,6 +324,138 @@ function Message({
   return (
     <div className={cn("space-y-2", isUser && "flex flex-col items-end")}>
       {parts}
+    </div>
+  )
+}
+
+// --- Generative UI pieces, one per tool ------------------------------------
+
+function ApprovalRequest({
+  part,
+  onApproval,
+}: {
+  part: ToolCallPart
+  onApproval: (id: string, approved: boolean) => void
+}) {
+  return (
+    <div className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm dark:border-amber-500/40 dark:bg-amber-500/10">
+      <p className="font-medium">
+        {part.name === "bookFlight"
+          ? "Approve this booking?"
+          : "Approve this cancellation?"}
+      </p>
+      <pre className="overflow-x-auto rounded-lg bg-background p-2 text-xs">
+        {JSON.stringify(parseArgs(part), null, 2)}
+      </pre>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={() => onApproval(part.approval!.id, true)}>
+          Approve
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => onApproval(part.approval!.id, false)}
+        >
+          Deny
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+interface SearchResultsOutput {
+  flights?: FlightSummary[]
+  totalMatching: number
+}
+
+function SearchResults({
+  output,
+  onBookFlight,
+  busy,
+}: {
+  output: SearchResultsOutput
+  onBookFlight: (flight: FlightSummary) => void
+  busy: boolean
+}) {
+  if (!output.flights?.length) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        No flights matched that search.
+      </p>
+    )
+  }
+  return (
+    <div className="space-y-2">
+      {output.flights.map((flight) => (
+        <FlightOptionCard
+          key={flight.id}
+          flight={flight}
+          onBook={onBookFlight}
+          disabled={busy}
+        />
+      ))}
+      {output.totalMatching > output.flights.length ? (
+        <p className="text-xs text-muted-foreground">
+          Showing {output.flights.length} of {output.totalMatching} matching
+          flights.
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+interface BookingOutput {
+  bookingRef: string
+  flightNumber: string
+  route: string
+  price: number
+}
+
+function BookingConfirmation({ output }: { output: BookingOutput }) {
+  return (
+    <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm dark:border-emerald-500/40 dark:bg-emerald-500/10">
+      <p className="font-medium">Booked! ✈️</p>
+      <p className="text-muted-foreground">
+        {output.flightNumber} · {output.route} · ${output.price}
+      </p>
+      <p className="mt-1 text-xs">
+        Confirmation{" "}
+        <span className="font-mono font-semibold">{output.bookingRef}</span>
+      </p>
+    </div>
+  )
+}
+
+interface TripsOutput {
+  trips: Array<{
+    tripId: number
+    flightNumber: string
+    route: string
+    departTime: string
+    bookingStatus: string
+    price: number
+  }>
+}
+
+function TripsList({ output }: { output: TripsOutput }) {
+  return (
+    <div className="space-y-1.5">
+      {output.trips.map((trip) => (
+        <div
+          key={trip.tripId}
+          className="flex items-center justify-between rounded-lg border bg-card px-3 py-2 text-sm"
+        >
+          <span className="font-medium">{trip.flightNumber}</span>
+          <span className="text-muted-foreground">{trip.route}</span>
+          <span className="text-muted-foreground">
+            {new Date(trip.departTime).toLocaleDateString([], {
+              month: "short",
+              day: "numeric",
+            })}
+          </span>
+          <span className="font-medium text-brand">${trip.price}</span>
+        </div>
+      ))}
     </div>
   )
 }

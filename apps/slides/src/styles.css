@@ -111,6 +111,23 @@
   }
 }
 
+/* View transitions between slides. The library badge + name share
+   view-transition-names across title and overview slides, so they glide
+   (and rescale) to their next position while the rest cross-fades. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+}
+
+/* z-index keeps the moving headers above the cross-fading slides */
+::view-transition-group(slide-heading),
+::view-transition-group(library-badge),
+::view-transition-group(library-name) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
 /* Layout-component typography — kept here so every size scales together */
 .slide-kicker {
   font-size: clamp(1.3rem, 2.2vw, 1.7rem);
@@ -234,6 +251,31 @@
   object-fit: contain;
 }
 
+/* Library overview slides — bullets left, code right. The MDX children are
+   just a <ul> and a <pre>; the grid splits them without extra markup. */
+.library-overview-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 4rem;
+  align-items: center;
+}
+
+.library-overview-body ul {
+  margin-top: 0;
+}
+
+.library-overview-body li {
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+}
+
+.library-overview-body pre {
+  margin-top: 0;
+}
+
+.library-overview-body pre code {
+  font-size: clamp(0.75rem, 1.275vw, 1.088rem);
+}
+
 .slide strong {
   color: var(--color-zinc-50);
   font-weight: 700;
@@ -266,7 +308,7 @@
 }
 
 .slide pre code {
-  font-size: clamp(1.35rem, 2.4vw, 1.875rem);
+  font-size: clamp(1.013rem, 1.8vw, 1.406rem);
   line-height: 1.6;
   background: transparent;
 }

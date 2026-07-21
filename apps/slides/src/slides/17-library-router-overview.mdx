@@ -1,0 +1,25 @@
+<LibraryOverviewSlide library="router">
+
+- 100% inferred TypeScript — typesafe navigation, params, and links
+- File-based **or** code-based routing
+- 1st-class search params: validated, typed, like `useState` in the URL
+- Built-in route loaders with SWR caching — pairs great with TanStack Query
+- Nested routes, layouts, automatic prefetching, error boundaries
+- Typesafe route context — great for auth and injecting a QueryClient
+
+```tsx
+// src/routes/posts.tsx
+import { createFileRoute } from "@tanstack/react-router"
+
+export const Route = createFileRoute("/posts")({
+  loader: () => fetchPosts(),
+  component: Posts,
+})
+
+function Posts() {
+  const posts = Route.useLoaderData()
+  return posts.map((p) => <li>{p.title}</li>)
+}
+```
+
+</LibraryOverviewSlide>

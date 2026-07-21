@@ -1,0 +1,19 @@
+<LibraryOverviewSlide library="intent">
+
+- CLI for shipping **Agent Skills** (SKILL.md) as npm package artifacts
+- Skills version with releases and ship inside the package — `npm update` gets matching skills
+- `intent list` discovers skills from installed deps; `intent load` prints them into agent context
+- `intent install` writes managed guidance into `AGENTS.md` / `CLAUDE.md`
+- Trust model: `package.json` allowlist controls whose skills are surfaced
+
+```bash
+# Set up agent guidance + enforcement
+npx @tanstack/intent@latest install
+
+# Discover and load skills
+npx @tanstack/intent@latest list
+npx @tanstack/intent@latest load \
+  @tanstack/react-query#core
+```
+
+</LibraryOverviewSlide>

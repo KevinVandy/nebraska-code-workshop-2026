@@ -1,0 +1,21 @@
+<LibraryOverviewSlide library="store">
+
+- Framework-agnostic signals-based store — powers state inside most TanStack libraries
+- Create stores anywhere, even outside components — no provider needed
+- Fine-grained subscriptions: `useSelector` only re-renders on the selected slice
+- Derived stores auto-recompute when dependencies change
+- `batch()` groups multiple updates into a single notification
+
+```tsx
+import { createStore, useSelector } from "@tanstack/react-store"
+
+const store = createStore({ dogs: 0 })
+
+function Dogs() {
+  const dogs = useSelector(store, (s) => s.dogs)
+  const inc = () => store.setState((s) => ({ ...s, dogs: s.dogs + 1 }))
+  return <button onClick={inc}>{dogs}</button>
+}
+```
+
+</LibraryOverviewSlide>

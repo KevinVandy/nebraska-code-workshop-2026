@@ -203,11 +203,17 @@ export function LibraryTitleSlide({
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           <span
             className="library-badge rounded-lg px-4 py-1.5 font-black tracking-wider text-zinc-950 uppercase"
-            style={{ backgroundColor: color }}
+            style={{
+              backgroundColor: color,
+              viewTransitionName: "library-badge",
+            }}
           >
             TanStack
           </span>
-          <h1 className="!mb-0 uppercase" style={{ color }}>
+          <h1
+            className="!mb-0 uppercase"
+            style={{ color, viewTransitionName: "library-name" }}
+          >
             {name}
           </h1>
         </div>
@@ -217,6 +223,48 @@ export function LibraryTitleSlide({
         </p>
 
         {children && <div className="mt-8 text-zinc-300">{children}</div>}
+      </div>
+    </FullBleed>
+  )
+}
+
+/**
+ * Capabilities overview for a library — brand-colored heading, then the MDX
+ * children split into two columns: the bullet list left, the code block right.
+ */
+export function LibraryOverviewSlide({
+  library,
+  children,
+}: {
+  library: LibraryId
+  children: ReactNode
+}) {
+  const { name, color } = libraries[library]
+
+  return (
+    <FullBleed className="bg-zinc-950">
+      <Glow color={color} />
+
+      <div className="relative flex min-h-0 flex-col">
+        <div className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span
+            className="library-badge rounded-lg px-3 py-1 font-black tracking-wider text-zinc-950 uppercase"
+            style={{
+              backgroundColor: color,
+              viewTransitionName: "library-badge",
+            }}
+          >
+            TanStack
+          </span>
+          <h2
+            className="!mb-0 !border-b-0 !pb-0 uppercase after:!hidden"
+            style={{ color, viewTransitionName: "library-name" }}
+          >
+            {name}
+          </h2>
+        </div>
+
+        <div className="library-overview-body">{children}</div>
       </div>
     </FullBleed>
   )

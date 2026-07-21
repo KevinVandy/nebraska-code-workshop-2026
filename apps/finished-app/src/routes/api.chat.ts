@@ -24,7 +24,11 @@ import { sessionFromCookieHeader } from "@/lib/auth"
 const API_URL = process.env.VITE_API_URL ?? "http://localhost:3300"
 const MODEL = process.env.OPENAI_MODEL ?? "gpt-4o"
 
-const SYSTEM_PROMPT = `You are Casper, the friendly concierge for Ghost Airlines — a budget airline flying to small, storied towns (Salem, Sleepy Hollow, Transylvania, Roswell, Amityville, Loch Ness, Savannah, New Orleans, Tombstone, Point Pleasant).
+// A function (not a module-level constant) so "today's date" is computed per
+// request — a dev server left running overnight would otherwise tell the
+// model yesterday's date and skew date-filtered searches.
+const systemPrompt =
+  () => `You are Casper, the friendly concierge for Ghost Airlines — a budget airline flying to small, storied towns (Salem, Sleepy Hollow, Transylvania, Roswell, Amityville, Loch Ness, Savannah, New Orleans, Tombstone, Point Pleasant).
 
 TWO DIFFERENT KINDS OF "STATUS" — never confuse these:
 - flightStatus (on-time | delayed | cancelled | scheduled) describes the AIRCRAFT. Get it from getFlightStatus, or from the flightStatus field on getMyTrips.
@@ -154,6 +158,17 @@ const getMyTrips = getMyTripsToolDef.server<CasperContext>(
 const bookFlight = bookFlightToolDef.server<CasperContext>(
   async (input, ctx) => {
     const flight = await apiJson<Flight>(`/flights/${input.flightId}`)
+    // The model can obtain ids for cancelled flights via getFlightStatus —
+    // never book one. A thrown error becomes the tool's failure result, which
+    // the model relays to the user.
+    if (flight.status !== "scheduled") {
+      throw new Error(
+        `${flight.flightNumber} is ${flight.status} and can't be booked.`
+      )
+    }
+    if (flight.seatsLeft < 1) {
+      throw new Error(`${flight.flightNumber} is sold out.`)
+    }
     const bookingRef = Math.random().toString(36).slice(2, 8).toUpperCase()
     const trip = await apiJson<{ id: number }>(`/trips`, {
       method: "POST",
@@ -185,10 +200,10 @@ const cancelTrip = cancelTripToolDef.server<CasperContext>(
   async (input, ctx) => {
     // Only let the caller cancel their own trips — the model supplies the id, so
     // never trust it blindly.
-    const [trip] = await apiJson<Array<{ id: number }>>(
+    const trips = await apiJson<Array<{ id: number }>>(
       `/trips?id=${input.tripId}&userId=${ctx.context.userId}`
     )
-    if (!trip)
+    if (trips.length === 0)
       throw new Error("That trip doesn't belong to the signed-in traveller.")
 
     await apiJson(`/trips/${input.tripId}`, {
@@ -237,8 +252,13 @@ export const Route = createFileRoute("/api/chat")({
           )
         }
 
-        if (request.signal.aborted) return new Response(null, { status: 499 })
+        /* When the browser disconnects mid-stream (tab closed, Casper's Stop
+         * button), the request's signal fires; forwarding it into this
+         * controller makes chat() stop calling OpenAI instead of streaming
+         * into the void. The SSE helper also aborts it if the client goes
+         * away mid-write. */
         const abortController = new AbortController()
+        request.signal.addEventListener("abort", () => abortController.abort())
 
         let params
         try {
@@ -255,12 +275,14 @@ export const Route = createFileRoute("/api/chat")({
         try {
           const mergedTools = mergeAgentTools(serverTools, params.tools)
           const stream = chat({
+            // OPENAI_MODEL is a free-form env override, so it's cast into the
+            // adapter's model union — an invalid name fails at the OpenAI API.
             adapter: openaiText(MODEL as "gpt-4o"),
             tools: Object.values(mergedTools),
             // Tools act as the signed-in traveller, not a hardcoded demo id.
             context: { userId: session.userId } satisfies CasperContext,
             systemPrompts: [
-              `${SYSTEM_PROMPT}\n\nYou are helping ${session.name} (${session.email}).`,
+              `${systemPrompt()}\n\nYou are helping ${session.name} (${session.email}).`,
             ],
             agentLoopStrategy: maxIterations(10),
             messages: params.messages,
@@ -270,12 +292,8 @@ export const Route = createFileRoute("/api/chat")({
           })
           return toServerSentEventsResponse(stream, { abortController })
         } catch (error) {
-          if (
-            (error instanceof Error && error.name === "AbortError") ||
-            abortController.signal.aborted
-          ) {
-            return new Response(null, { status: 499 })
-          }
+          // Errors during streaming surface inside the SSE stream itself;
+          // this catch only sees synchronous setup failures.
           console.error("[/api/chat] error:", error)
           return Response.json(
             { error: error instanceof Error ? error.message : "Chat failed" },

@@ -1,0 +1,29 @@
+<LibraryOverviewSlide library="table">
+
+- **Headless** — the table engine; you own 100% of markup and styles
+- ~95% framework-agnostic core, adapters for every major framework
+- Modular (v9): register only the features you use, the rest tree-shakes away
+- Sorting, filtering, pagination, selection, expanding, grouping, pinning, resizing…
+- State backed by TanStack Store — lift any slice into your own state or the URL
+- Composes with Virtual, Query, and Form
+
+```tsx
+import { tableFeatures, useTable } from "@tanstack/react-table"
+
+const features = tableFeatures({}) // opt-in!
+
+function PersonTable() {
+  const table = useTable({
+    features,
+    columns,
+    data,
+  })
+  return table
+    .getRowModel()
+    .rows.map((row) =>
+      row.getAllCells().map((cell) => <table.FlexRender cell={cell} />)
+    )
+}
+```
+
+</LibraryOverviewSlide>

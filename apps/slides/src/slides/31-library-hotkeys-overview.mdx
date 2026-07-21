@@ -1,0 +1,22 @@
+<LibraryOverviewSlide library="hotkeys">
+
+- Type-safe hotkey strings with autocomplete — `'Mod+Shift+S'` checked at compile time
+- Cross-platform: `Mod` = Cmd on macOS, Ctrl on Windows/Linux
+- Sensible defaults: `preventDefault`, auto-ignored while inputs are focused
+- Vim-style multi-key sequences with `useHotkeySequence`
+- Hotkey recording for settings UIs + platform-aware display (⌘⇧S vs Ctrl+Shift+S)
+- _These slides are powered by TanStack Hotkeys!_
+
+```tsx
+import { useHotkey } from "@tanstack/react-hotkeys"
+
+function App() {
+  useHotkey("Mod+S", () => {
+    saveDocument()
+  })
+
+  return <div>Press Cmd/Ctrl+S to save</div>
+}
+```
+
+</LibraryOverviewSlide>

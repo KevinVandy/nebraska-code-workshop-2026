@@ -1,0 +1,26 @@
+<LibraryOverviewSlide library="form">
+
+- First-class TypeScript — field names inferred from `defaultValues`
+- Headless and framework-agnostic
+- Sync + async per-field validation with built-in debouncing
+- Schema validation with Zod, Valibot, ArkType, or any Standard Schema
+- Fine-grained reactivity: `form.Subscribe` re-renders only what changed
+- `createFormHook` pre-binds your own field components to kill boilerplate
+
+```tsx
+import { useForm } from '@tanstack/react-form'
+
+const form = useForm({
+  defaultValues: { firstName: '' },
+  onSubmit: ({ value }) => console.log(value),
+})
+
+<form.Field name="firstName" children={(f) => (
+  <input
+    value={f.state.value}
+    onChange={(e) =>
+      f.handleChange(e.target.value)} />
+)} />
+```
+
+</LibraryOverviewSlide>

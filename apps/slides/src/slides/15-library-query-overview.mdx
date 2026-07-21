@@ -1,0 +1,24 @@
+<LibraryOverviewSlide library="query">
+
+- Fetching, caching, syncing, and updating **server state**
+- Zero-config defaults: caching, request deduping, background refetching, garbage collection
+- Three core concepts: **Queries**, **Mutations**, and **Query Invalidation**
+- Structural sharing + memoized results = fewer re-renders
+- Replaces piles of hand-rolled `useEffect` + `useState` fetching code
+
+```tsx
+import { useQuery } from "@tanstack/react-query"
+
+function Todos() {
+  const { data, isPending, error } = useQuery({
+    queryKey: ["todos"],
+    queryFn: getTodos,
+  })
+
+  if (isPending) return "Loading..."
+  if (error) return "Error: " + error.message
+  return data.map((t) => <li>{t.title}</li>)
+}
+```
+
+</LibraryOverviewSlide>

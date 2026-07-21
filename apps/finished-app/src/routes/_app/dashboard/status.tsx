@@ -1,7 +1,18 @@
 import * as React from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { createColumnHelper, useTable } from "@tanstack/react-table"
+import {
+  columnSizingFeature,
+  createColumnHelper,
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_basic,
+  sortFn_datetime,
+  sortFn_text,
+  tableFeatures,
+  useTable,
+} from "@tanstack/react-table"
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import { RefreshCw } from "lucide-react"
 
@@ -20,7 +31,29 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { StatusBadge } from "@/components/status-badge"
 import { airportsQuery, flightStatusQuery } from "@/lib/api"
-import { SortIndicator, dataTableFeatures } from "@/lib/table"
+
+/* This table's TanStack Table v9 feature set: client-side sorting + sizing.
+ * Declared per-route so each table registers only what it uses. */
+const features = tableFeatures({
+  columnSizingFeature,
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    basic: sortFn_basic,
+    datetime: sortFn_datetime,
+    text: sortFn_text,
+  },
+})
+
+// Fixed-width arrow so sorting never reflows or wraps the header label.
+function SortIndicator({ sorted }: { sorted: false | string }) {
+  return (
+    <span aria-hidden className="w-3 shrink-0 text-xs leading-none">
+      {sorted === "asc" ? "↑" : sorted === "desc" ? "↓" : ""}
+    </span>
+  )
+}
 
 export const Route = createFileRoute("/_app/dashboard/status")({
   component: StatusPage,
@@ -45,7 +78,7 @@ function formatTime(iso: string) {
 // to the async airports query purely through `data`.
 type StatusRow = Flight & { destinationLabel: string }
 
-const columnHelper = createColumnHelper<typeof dataTableFeatures, StatusRow>()
+const columnHelper = createColumnHelper<typeof features, StatusRow>()
 
 const columns = columnHelper.columns([
   columnHelper.accessor("flightNumber", {
@@ -87,7 +120,7 @@ function StatusPage() {
 
   const table = useTable(
     {
-      features: dataTableFeatures,
+      features,
       data: rows,
       columns,
       getRowId: (row) => String(row.id),

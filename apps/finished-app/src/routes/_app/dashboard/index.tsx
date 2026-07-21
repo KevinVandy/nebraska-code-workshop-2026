@@ -1,7 +1,20 @@
 import * as React from "react"
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createColumnHelper, useTable } from "@tanstack/react-table"
+import {
+  columnSizingFeature,
+  createColumnHelper,
+  createSortedRowModel,
+  metaHelper,
+  rowSelectionFeature,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_basic,
+  sortFn_datetime,
+  sortFn_text,
+  tableFeatures,
+  useTable,
+} from "@tanstack/react-table"
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import type { RowSelectionState } from "@tanstack/react-table"
 import type { TripWithFlight } from "@workspace/types"
@@ -28,13 +41,12 @@ import { StatusBadge } from "@/components/status-badge"
 import { TripsChart } from "@/components/trips-chart"
 import type { ChartPoint } from "@/components/trips-chart"
 import {
+  API_URL,
   allTripsQuery,
-  cancelTrip,
   currentUserQuery,
   dealsQuery,
   upcomingTripsQuery,
 } from "@/lib/api"
-import { SortIndicator, dataTableFeatures } from "@/lib/table"
 
 export const Route = createFileRoute("/_app/dashboard/")({
   component: OverviewPage,
@@ -55,10 +67,48 @@ const MONTHS = [
   "Dec",
 ]
 
-const columnHelper = createColumnHelper<
-  typeof dataTableFeatures,
-  TripWithFlight
->()
+// Cancel a booked trip (PATCH). The mutation invalidates ["trips"] on success.
+async function cancelTrip(tripId: number) {
+  const res = await fetch(`${API_URL}/trips/${tripId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status: "cancelled" }),
+  })
+  if (!res.ok) throw new Error(`Failed to cancel trip ${tripId}`)
+}
+
+/* This table's TanStack Table v9 feature set. Declared per-route so each
+ * table only registers what it actually uses — this one is the only table in
+ * the app with row selection. `tableMeta` is a type-only slot: it types
+ * `options.meta`, which is how cells reach the cancel mutation without the
+ * column definitions depending on it. */
+const features = tableFeatures({
+  columnSizingFeature,
+  rowSortingFeature,
+  rowSelectionFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    basic: sortFn_basic,
+    datetime: sortFn_datetime,
+    text: sortFn_text,
+  },
+  tableMeta: metaHelper<{
+    cancelTrip: (tripId: number) => void
+    cancellingId?: number
+  }>(),
+})
+
+// Fixed-width arrow so sorting never reflows or wraps the header label.
+function SortIndicator({ sorted }: { sorted: false | string }) {
+  return (
+    <span aria-hidden className="w-3 shrink-0 text-xs leading-none">
+      {sorted === "asc" ? "↑" : sorted === "desc" ? "↓" : ""}
+    </span>
+  )
+}
+
+const columnHelper = createColumnHelper<typeof features, TripWithFlight>()
 
 function OverviewPage() {
   const queryClient = useQueryClient()
@@ -72,15 +122,11 @@ function OverviewPage() {
   const cancel = useMutation({
     mutationFn: cancelTrip,
     onSuccess: () => {
-      // Invalidate so the table + chart refetch with the cancelled trip removed.
+      // Refetch everything trip-derived: the upcoming-trips table and the
+      // trips-over-time chart (which skips cancelled trips when aggregating).
       queryClient.invalidateQueries({ queryKey: ["trips"] })
     },
   })
-
-  // Keep the column definitions static: cells read the latest mutation through
-  // this ref on each render instead of the columns depending on it.
-  const cancelRef = React.useRef(cancel)
-  cancelRef.current = cancel
 
   const columns = React.useMemo(
     () =>
@@ -93,6 +139,11 @@ function OverviewPage() {
               type="checkbox"
               aria-label="Select all"
               checked={table.getIsAllRowsSelected()}
+              // A checkbox can be checked, unchecked, or half-checked — the
+              // last one only exists as a DOM property, hence the ref.
+              ref={(el) => {
+                if (el) el.indeterminate = table.getIsSomeRowsSelected()
+              }}
               onChange={table.getToggleAllRowsSelectedHandler()}
             />
           ),
@@ -143,16 +194,16 @@ function OverviewPage() {
           id: "actions",
           header: "Actions",
           size: 120,
-          cell: ({ row }) => (
+          // Cells reach the mutation through `table.options.meta` (typed by
+          // the `tableMeta` slot above), so the column definitions never
+          // depend on per-render values and can stay static.
+          cell: ({ row, table }) => (
             <Button
               variant="outline"
               size="sm"
               className="ml-auto"
-              onClick={() => cancelRef.current.mutate(row.original.id)}
-              disabled={
-                cancelRef.current.isPending &&
-                cancelRef.current.variables === row.original.id
-              }
+              onClick={() => table.options.meta?.cancelTrip(row.original.id)}
+              disabled={table.options.meta?.cancellingId === row.original.id}
             >
               Cancel
             </Button>
@@ -164,12 +215,16 @@ function OverviewPage() {
 
   const table = useTable(
     {
-      features: dataTableFeatures,
+      features,
       data: upcoming.data ?? [],
       columns,
       state: { rowSelection },
       onRowSelectionChange: setRowSelection,
       getRowId: (row) => String(row.id),
+      meta: {
+        cancelTrip: cancel.mutate,
+        cancellingId: cancel.isPending ? cancel.variables : undefined,
+      },
     },
     (state) => state
   )
@@ -177,9 +232,11 @@ function OverviewPage() {
   // Register this table with the unified TanStack Devtools panel.
   useTanStackTableDevtools(table)
 
-  // Aggregate trips-per-month for the chart.
+  // Aggregate trips-per-month for the chart, skipping cancelled trips so the
+  // bars visibly drop when a trip is cancelled from the table below.
   const chartData: ChartPoint[] = MONTHS.map((month) => ({ month, value: 0 }))
   for (const trip of allTrips.data ?? []) {
+    if (trip.status === "cancelled") continue
     const monthIndex = new Date(trip.bookedAt).getMonth()
     chartData[monthIndex].value += 1
   }
@@ -195,7 +252,7 @@ function OverviewPage() {
     {
       label: "Ghost Miles",
       value: user.data ? user.data.milesBalance.toLocaleString() : "—",
-      sub: `${user.data?.tier ?? ""} member`,
+      sub: user.data ? `${user.data.tier} member` : "",
     },
     {
       label: "Next Flight",
@@ -245,7 +302,7 @@ function OverviewPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {/* Live: the cheapest scheduled flight on each of 4 routes. Each
-              * deal links into Book a Flight with typed search params. */}
+             * deal links into Book a Flight with typed search params. */}
             {(deals.data ?? []).map((flight) => (
               <Link
                 key={flight.id}
@@ -274,8 +331,23 @@ function OverviewPage() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Upcoming trips</CardTitle>
+          {/* Row selection's payoff: bulk-cancel everything checked. */}
+          {Object.keys(rowSelection).length > 0 ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                for (const tripId of Object.keys(rowSelection)) {
+                  cancel.mutate(Number(tripId))
+                }
+                setRowSelection({})
+              }}
+            >
+              Cancel selected ({Object.keys(rowSelection).length})
+            </Button>
+          ) : null}
         </CardHeader>
         <CardContent>
           <Table>

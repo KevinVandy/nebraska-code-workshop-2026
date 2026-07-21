@@ -1,19 +1,60 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useMutation } from "@tanstack/react-query"
+import { useForm } from "@tanstack/react-form"
+import type { AnyFieldApi } from "@tanstack/react-form"
+import { z } from "zod"
 
-import { useAppForm } from "@/components/form"
-import { sendMessage } from "@/lib/api"
+import { Button } from "@workspace/ui/components/button"
+import { Input } from "@workspace/ui/components/input"
+import { Label } from "@workspace/ui/components/label"
+import { Textarea } from "@workspace/ui/components/textarea"
+
+import { API_URL } from "@/lib/api"
 import { HQ_MAP_EMBED } from "@/lib/images"
-import { contactSchema } from "@/lib/schemas"
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Please tell us your name."),
+  email: z.email("Enter a valid email address."),
+  subject: z.string().min(3, "Add a short subject."),
+  message: z
+    .string()
+    .min(10, "Give us a little more detail (at least 10 characters).")
+    .max(1000, "That's a bit long — keep it under 1000 characters."),
+})
+
+type ContactValues = z.infer<typeof contactSchema>
+
+/** Real POST to the API's `messages` resource. */
+async function sendMessage(values: ContactValues) {
+  const res = await fetch(`${API_URL}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...values, createdAt: new Date().toISOString() }),
+  })
+  if (!res.ok) throw new Error("Couldn't send your message. Please try again.")
+  return res.json() as Promise<ContactValues & { id: number }>
+}
 
 export const Route = createFileRoute("/_marketing/contact")({
   component: ContactPage,
 })
 
+function FieldError({ field }: { field: AnyFieldApi }) {
+  if (!field.state.meta.isTouched || field.state.meta.isValid) return null
+  return (
+    <p className="text-xs text-destructive">
+      {field.state.meta.errors.map((err) => err?.message).join(", ")}
+    </p>
+  )
+}
+
 function ContactPage() {
+  /* This form pairs TanStack Form with a TanStack Query useMutation, so
+   * submit state (isPending/isSuccess/isError) comes from the mutation.
+   * Compare with login/signup, which keep submit errors in plain useState. */
   const send = useMutation({ mutationFn: sendMessage })
 
-  const form = useAppForm({
+  const form = useForm({
     defaultValues: { name: "", email: "", subject: "", message: "" },
     // One zod schema drives validation for every field (Standard Schema).
     validators: { onChange: contactSchema },
@@ -36,50 +77,87 @@ function ContactPage() {
           className="mt-8 space-y-5"
           onSubmit={(e) => {
             e.preventDefault()
-            e.stopPropagation()
             form.handleSubmit()
           }}
         >
           <div className="grid gap-5 sm:grid-cols-2">
-            <form.AppField name="name">
+            <form.Field name="name">
               {(field) => (
-                <field.TextField
-                  label="Name"
-                  placeholder="Jamie Rivera"
-                  autoComplete="name"
-                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor={field.name}>Name</Label>
+                  <Input
+                    id={field.name}
+                    placeholder="Jamie Rivera"
+                    autoComplete="name"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                  <FieldError field={field} />
+                </div>
               )}
-            </form.AppField>
-            <form.AppField name="email">
+            </form.Field>
+            <form.Field name="email">
               {(field) => (
-                <field.TextField
-                  label="Email"
-                  type="email"
-                  placeholder="jamie@email.com"
-                  autoComplete="email"
-                />
+                <div className="grid gap-1.5">
+                  <Label htmlFor={field.name}>Email</Label>
+                  <Input
+                    id={field.name}
+                    type="email"
+                    placeholder="jamie@email.com"
+                    autoComplete="email"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                  />
+                  <FieldError field={field} />
+                </div>
               )}
-            </form.AppField>
+            </form.Field>
           </div>
 
-          <form.AppField name="subject">
+          <form.Field name="subject">
             {(field) => (
-              <field.TextField label="Subject" placeholder="Booking question" />
+              <div className="grid gap-1.5">
+                <Label htmlFor={field.name}>Subject</Label>
+                <Input
+                  id={field.name}
+                  placeholder="Booking question"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                />
+                <FieldError field={field} />
+              </div>
             )}
-          </form.AppField>
+          </form.Field>
 
-          <form.AppField name="message">
+          <form.Field name="message">
             {(field) => (
-              <field.TextareaField
-                label="Message"
-                placeholder="How can we help?"
-              />
+              <div className="grid gap-1.5">
+                <Label htmlFor={field.name}>Message</Label>
+                <Textarea
+                  id={field.name}
+                  rows={6}
+                  placeholder="How can we help?"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                />
+                <FieldError field={field} />
+              </div>
             )}
-          </form.AppField>
+          </form.Field>
 
-          <form.AppForm>
-            <form.SubmitButton label="Send message" pendingLabel="Sending…" />
-          </form.AppForm>
+          <form.Subscribe
+            selector={(state) => [state.canSubmit, state.isSubmitting] as const}
+          >
+            {([canSubmit, isSubmitting]) => (
+              <Button type="submit" size="lg" disabled={!canSubmit}>
+                {isSubmitting ? "Sending…" : "Send message"}
+              </Button>
+            )}
+          </form.Subscribe>
 
           {send.isSuccess ? (
             <p className="text-sm text-emerald-600 dark:text-emerald-400">
@@ -87,9 +165,7 @@ function ContactPage() {
             </p>
           ) : null}
           {send.isError ? (
-            <p className="text-sm text-destructive">
-              {(send.error).message}
-            </p>
+            <p className="text-sm text-destructive">{send.error.message}</p>
           ) : null}
         </form>
       </div>

@@ -1,0 +1,23 @@
+<LibraryOverviewSlide library="start">
+
+- Full-stack React framework powered 100% by TanStack Router
+- Full-document SSR + streaming for performance and SEO
+- **Server functions**: type-safe RPCs called like normal functions
+- Server routes / API endpoints alongside your frontend
+- Middleware + context, end-to-end type safety across the stack
+- Deploy anywhere — Vite builds, hosting-provider agnostic
+
+```tsx
+import { createServerFn } from "@tanstack/react-start"
+
+const getServerTime = createServerFn().handler(async () => {
+  // Runs only on the server
+  return new Date().toISOString()
+})
+
+export const Route = createFileRoute("/")({
+  loader: () => getServerTime(),
+})
+```
+
+</LibraryOverviewSlide>

@@ -1,8 +1,13 @@
 import * as React from "react"
 import { Link } from "@tanstack/react-router"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query"
 
-import type { Flight } from "@workspace/types"
+import type { Flight, Trip } from "@workspace/types"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import {
   Dialog,
@@ -14,7 +19,7 @@ import {
 } from "@workspace/ui/components/dialog"
 
 import { useAuth } from "../auth-context"
-import { bookFlight, cheapestFlightQuery } from "@/lib/api"
+import { API_URL } from "@/lib/api"
 
 /**
  * What the user asked to book. Either an exact flight (from the dashboard
@@ -24,6 +29,54 @@ import { bookFlight, cheapestFlightQuery } from "@/lib/api"
 export type BookingTarget =
   | { kind: "flight"; flight: Flight }
   | { kind: "route"; origin?: string; destination?: string; label: string }
+
+/** Cheapest upcoming bookable flight on a route (used for deal targets). */
+function cheapestFlightQuery(origin?: string, destination?: string) {
+  return queryOptions({
+    queryKey: ["flights", "cheapest", origin, destination],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        status: "scheduled",
+        _sort: "price",
+        _limit: "1",
+      })
+      if (origin) params.set("originCode", origin)
+      if (destination) params.set("destinationCode", destination)
+      const res = await fetch(`${API_URL}/flights?${params.toString()}`)
+      if (!res.ok) throw new Error("Couldn't look up flights for that route.")
+      const flights = (await res.json()) as Flight[]
+      return flights[0] ?? null
+    },
+    enabled: origin != null || destination != null,
+  })
+}
+
+async function bookFlight(input: {
+  userId: number
+  flight: Flight
+  passengers: number
+}) {
+  const bookingRef = Math.random().toString(36).slice(2, 8).toUpperCase()
+  const res = await fetch(`${API_URL}/trips`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: input.userId,
+      flightId: input.flight.id,
+      bookingRef,
+      status: "upcoming",
+      bookingStatus: "confirmed",
+      seat: `${Math.ceil(Math.random() * 30)}A`,
+      cabin: input.flight.cabin,
+      passengers: input.passengers,
+      bookedAt: new Date().toISOString(),
+    }),
+  })
+  if (!res.ok)
+    throw new Error("Couldn't complete the booking. Please try again.")
+  const trip = (await res.json()) as Trip
+  return { ...trip, bookingRef }
+}
 
 interface BookingContextValue {
   openBooking: (target: BookingTarget) => void
@@ -39,16 +92,24 @@ export function useBooking() {
 
 export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [target, setTarget] = React.useState<BookingTarget | null>(null)
-  const openBooking = React.useCallback(
-    (next: BookingTarget) => setTarget(next),
-    []
-  )
+  // Bumped on every open; used as the dialog's `key` so each booking attempt
+  // remounts with fresh state (no effect-based reset needed).
+  const [openCount, setOpenCount] = React.useState(0)
+
+  const openBooking = React.useCallback((next: BookingTarget) => {
+    setTarget(next)
+    setOpenCount((count) => count + 1)
+  }, [])
   const value = React.useMemo(() => ({ openBooking }), [openBooking])
 
   return (
     <BookingContext.Provider value={value}>
       {children}
-      <BookingDialog target={target} onClose={() => setTarget(null)} />
+      <BookingDialog
+        key={openCount}
+        target={target}
+        onClose={() => setTarget(null)}
+      />
     </BookingContext.Provider>
   )
 }
@@ -101,15 +162,6 @@ function BookingDialog({
     },
   })
 
-  // Reset per-open state whenever the dialog opens with a new target.
-  React.useEffect(() => {
-    if (target) {
-      setConfirmed(null)
-      book.reset()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target])
-
   const open = target !== null
   const resolving = target?.kind === "route" && cheapest.isPending
 
@@ -138,7 +190,7 @@ function BookingDialog({
               <DialogTitle>Confirm your booking</DialogTitle>
               <DialogDescription>
                 {resolving
-                  ? "Finding the best fare…"
+                  ? `Finding the best fare${routeTarget ? ` for ${routeTarget.label}` : ""}…`
                   : flight
                     ? "Review the details before we book this flight."
                     : "No bookable flight was found for that route."}
@@ -168,9 +220,7 @@ function BookingDialog({
             ) : null}
 
             {book.isError ? (
-              <p className="text-sm text-destructive">
-                {(book.error).message}
-              </p>
+              <p className="text-sm text-destructive">{book.error.message}</p>
             ) : null}
 
             <DialogFooter>

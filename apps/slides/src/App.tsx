@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from "react"
+import { flushSync } from "react-dom"
 import { MDXProvider } from "@mdx-js/react"
 import { useHotkey } from "@tanstack/react-hotkeys"
 import { slides } from "./slides"
@@ -13,6 +14,7 @@ import {
   DevObsessed,
   GradientText,
   Kicker,
+  LibraryOverviewSlide,
   LibraryTitleSlide,
   Note,
   SectionSlide,
@@ -26,17 +28,41 @@ const mdxComponents = {
   DevObsessed,
   GradientText,
   Kicker,
+  LibraryOverviewSlide,
   LibraryTitleSlide,
   Note,
   SectionSlide,
   TheStack,
   TitleSlide,
+  // Content-slide headings share one transition name, so consecutive
+  // slides' titles morph into each other instead of cross-fading.
+  h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h2 {...props} style={{ viewTransitionName: "slide-heading" }} />
+  ),
   img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
     <img {...props} className={`slide-reveal ${props.className ?? ""}`} />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a {...props} target="_blank" rel="noopener noreferrer" />
   ),
+}
+
+/**
+ * Animate a slide change with the browser View Transition API. Elements
+ * sharing a `view-transition-name` (the library badge + name on title and
+ * overview slides) morph to their new position; everything else cross-fades.
+ * React's own <ViewTransition> is still experimental-only, so we use the
+ * native API it wraps.
+ */
+function withViewTransition(update: () => void) {
+  if (
+    !document.startViewTransition ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    update()
+    return
+  }
+  document.startViewTransition(() => flushSync(update))
 }
 
 function slideFromHash(): number {
@@ -67,7 +93,7 @@ export function App() {
       const clamped = Math.min(Math.max(i, 0), slides.length - 1)
       if (clamped === index) return
       entryRef.current = entry
-      setIndex(clamped)
+      withViewTransition(() => setIndex(clamped))
     },
     [index]
   )
@@ -106,7 +132,8 @@ export function App() {
   }, [index])
 
   useEffect(() => {
-    const onHashChange = () => setIndex(slideFromHash())
+    const onHashChange = () =>
+      withViewTransition(() => setIndex(slideFromHash()))
     window.addEventListener("hashchange", onHashChange)
     return () => window.removeEventListener("hashchange", onHashChange)
   }, [])

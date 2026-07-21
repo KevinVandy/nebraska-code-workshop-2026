@@ -37,7 +37,7 @@ export function TripsChart({ data }: { data: ChartPoint[] }) {
             }
           />
           {/* --brand rather than the pale primary yellow: it keeps ≥3:1
-            * contrast against the card surface in BOTH light and dark mode. */}
+           * contrast against the card surface in BOTH light and dark mode. */}
           <Bar
             dataKey="value"
             fill="var(--brand)"

@@ -1,9 +1,10 @@
 import * as React from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
-import { useDebouncedCallback } from "@tanstack/react-pacer"
+import { queryOptions, useQuery } from "@tanstack/react-query"
+import { useDebouncer } from "@tanstack/react-pacer"
 import { Keyboard, Plane, Search, User } from "lucide-react"
 
+import type { Flight } from "@workspace/types"
 import {
   Dialog,
   DialogContent,
@@ -13,8 +14,23 @@ import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { useCasper } from "../casper/casper-context"
-import { flightSearchQuery } from "@/lib/api"
+import { API_URL } from "@/lib/api"
 import { formatHotkey } from "./shortcut-registry"
+
+/** Free-text flight lookup for the palette's "Flights" section. */
+function flightSearchQuery(q: string) {
+  return queryOptions({
+    queryKey: ["flights", "search", q],
+    queryFn: async () => {
+      const res = await fetch(
+        `${API_URL}/flights?status=scheduled&q=${encodeURIComponent(q)}&_limit=5`
+      )
+      if (!res.ok) throw new Error("Flight search failed.")
+      return res.json() as Promise<Flight[]>
+    },
+    enabled: q.trim().length > 0,
+  })
+}
 
 interface Command {
   id: string
@@ -38,18 +54,23 @@ export function CommandPalette({
   const [text, setText] = React.useState("")
   const [query, setQuery] = React.useState("")
 
-  // Pacer again: typing stays instant, the flight lookup is debounced.
-  const commitQuery = useDebouncedCallback((value: string) => setQuery(value), {
+  // Pacer again: typing stays instant, the flight lookup is debounced. The
+  // debouncer object (vs a plain debounced callback) exposes cancel(), which
+  // we need below.
+  const queryDebouncer = useDebouncer((value: string) => setQuery(value), {
     wait: 300,
   })
 
-  // Reset whenever it opens so you always start fresh.
+  // Reset whenever it opens so you always start fresh. Cancelling matters:
+  // without it, a keystroke debounced just before Escape would fire AFTER
+  // reopening and show phantom results under an empty input.
   React.useEffect(() => {
     if (open) {
+      queryDebouncer.cancel()
       setText("")
       setQuery("")
     }
-  }, [open])
+  }, [open, queryDebouncer])
 
   const flights = useQuery(flightSearchQuery(query))
 
@@ -121,7 +142,7 @@ export function CommandPalette({
             value={text}
             onChange={(e) => {
               setText(e.target.value)
-              commitQuery(e.target.value)
+              queryDebouncer.maybeExecute(e.target.value)
             }}
             placeholder="Search commands or flights…"
             className="h-8 border-0 p-0 shadow-none focus-visible:ring-0"

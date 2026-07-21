@@ -2,29 +2,33 @@ import * as React from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import {
   keepPreviousData,
+  queryOptions,
   useInfiniteQuery,
   useQuery,
 } from "@tanstack/react-query"
-import { createColumnHelper, useTable } from "@tanstack/react-table"
+import {
+  columnSizingFeature,
+  createColumnHelper,
+  metaHelper,
+  rowSortingFeature,
+  tableFeatures,
+  useTable,
+} from "@tanstack/react-table"
 import { useTanStackTableDevtools } from "@tanstack/react-table-devtools"
 import type { OnChangeFn, SortingState } from "@tanstack/react-table"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { useDebouncedCallback } from "@tanstack/react-pacer"
 import { z } from "zod"
-import type { Flight } from "@workspace/types"
+import type { Flight, PriceHistoryPoint } from "@workspace/types"
 import { Button } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { cn } from "@workspace/ui/lib/utils"
 import { useBooking } from "@/components/booking/booking-dialog"
+import type { BookingTarget } from "@/components/booking/booking-dialog"
 import { PriceHistoryChart } from "@/components/price-history-chart"
-import {
-  airportsQuery,
-  flightsInfiniteQuery,
-  priceHistoryQuery,
-} from "@/lib/api"
-import { SortIndicator, dataTableFeatures } from "@/lib/table"
+import { API_URL, airportsQuery, flightsInfiniteQuery } from "@/lib/api"
 
 // Filters live in the URL, so they're shareable/bookmarkable — and Casper's
 // applySearchFilters client tool can navigate here with typed values.
@@ -39,6 +43,41 @@ export const Route = createFileRoute("/_app/dashboard/book")({
   validateSearch: bookSearchSchema,
   component: BookPage,
 })
+
+/** 30 days of seeded daily prices for one route (e.g. SLM→RSW). */
+function priceHistoryQuery(from?: string, to?: string) {
+  return queryOptions({
+    queryKey: ["priceHistory", from, to],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/priceHistory?route=${from}-${to}`)
+      if (!res.ok) throw new Error("Couldn't load price history.")
+      return res.json() as Promise<PriceHistoryPoint[]>
+    },
+    enabled: Boolean(from && to),
+    staleTime: Infinity, // seeded data — one point per day, never changes mid-session
+  })
+}
+
+/* This table's TanStack Table v9 feature set: sizing + sorting only — the
+ * sorting itself is manual (json-server sorts server-side), and there's no
+ * row selection here. `tableMeta` types `options.meta`, which is how the Book
+ * cell reaches the dialog opener without the columns depending on it. */
+const features = tableFeatures({
+  columnSizingFeature,
+  rowSortingFeature,
+  tableMeta: metaHelper<{
+    openBooking: (target: BookingTarget) => void
+  }>(),
+})
+
+// Fixed-width arrow so sorting never reflows or wraps the header label.
+function SortIndicator({ sorted }: { sorted: false | string }) {
+  return (
+    <span aria-hidden className="w-3 shrink-0 text-xs leading-none">
+      {sorted === "asc" ? "↑" : sorted === "desc" ? "↓" : ""}
+    </span>
+  )
+}
 
 const selectClass =
   "h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -56,7 +95,7 @@ function formatStops(stops: number) {
   return stops === 0 ? "Nonstop" : `${stops} stop${stops > 1 ? "s" : ""}`
 }
 
-const columnHelper = createColumnHelper<typeof dataTableFeatures, Flight>()
+const columnHelper = createColumnHelper<typeof features, Flight>()
 
 function BookPage() {
   const airports = useQuery(airportsQuery)
@@ -86,16 +125,17 @@ function BookPage() {
     { wait: 400 }
   )
 
-  // Keep the input in sync when the URL changes from elsewhere (e.g. Casper's
-  // applySearchFilters tool, or the back button).
+  // This effect exists ONLY for external writers of ?q= (Casper's
+  // applySearchFilters tool, the back button, the ⌘K palette). While the user
+  // is typing in the input, the input itself is the source of truth — syncing
+  // then would clobber keystrokes that landed during the debounce gap.
+  const searchInputRef = React.useRef<HTMLInputElement>(null)
   React.useEffect(() => {
+    if (document.activeElement === searchInputRef.current) return
     setSearchText(filters.q ?? "")
   }, [filters.q])
 
-  // Columns are static, so the Book cell reads the latest opener via a ref.
   const { openBooking } = useBooking()
-  const openBookingRef = React.useRef(openBooking)
-  openBookingRef.current = openBooking
 
   const tableContainerRef = React.useRef<HTMLDivElement>(null)
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -131,12 +171,17 @@ function BookPage() {
           id: "book",
           header: "",
           size: 110,
-          cell: ({ row }) => (
+          // Cells reach the dialog opener through `table.options.meta`, so
+          // the column definitions never depend on per-render values.
+          cell: ({ row, table }) => (
             <Button
               size="sm"
               className="ml-auto"
               onClick={() =>
-                openBookingRef.current({ kind: "flight", flight: row.original })
+                table.options.meta?.openBooking({
+                  kind: "flight",
+                  flight: row.original,
+                })
               }
             >
               Book
@@ -178,12 +223,13 @@ function BookPage() {
 
   const table = useTable(
     {
-      features: dataTableFeatures,
+      features,
       data: flatData,
       columns,
       state: { sorting },
       manualSorting: true, // json-server does the sorting server-side
-      debugTable: false,
+      getRowId: (row) => String(row.id),
+      meta: { openBooking },
     },
     (state) => state
   )
@@ -197,6 +243,8 @@ function BookPage() {
     count: rows.length,
     estimateSize: () => 48,
     getScrollElement: () => tableContainerRef.current,
+    // Measure real row heights — except in Firefox, which reports table-row
+    // border heights incorrectly (same workaround as the official example).
     measureElement:
       typeof window !== "undefined" &&
       navigator.userAgent.indexOf("Firefox") === -1
@@ -270,6 +318,7 @@ function BookPage() {
             <Label htmlFor="search">Search</Label>
             <Input
               id="search"
+              ref={searchInputRef}
               placeholder="Flight #, city, or airport code"
               value={searchText}
               onChange={(e) => {
@@ -279,7 +328,8 @@ function BookPage() {
             />
           </div>
           <p className="pb-2 text-sm whitespace-nowrap text-muted-foreground">
-            {totalRowCount ? `${totalRowCount} flights found` : "…"}
+            {/* isLoading (not a falsy count) — zero results is a real answer. */}
+            {isLoading ? "…" : `${totalRowCount} flights found`}
           </p>
         </div>
       </Card>
@@ -346,6 +396,10 @@ function BookPage() {
               {isLoading ? (
                 <tr className="flex px-4 py-8 text-muted-foreground">
                   <td>Loading flights…</td>
+                </tr>
+              ) : rows.length === 0 ? (
+                <tr className="flex px-4 py-8 text-muted-foreground">
+                  <td>No flights match your filters.</td>
                 </tr>
               ) : (
                 rowVirtualizer.getVirtualItems().map((virtualRow) => {

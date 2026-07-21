@@ -44,7 +44,7 @@ export function ShortcutsDialog({
                       {shortcut.label}
                     </span>
                     <kbd className="rounded border bg-muted px-2 py-0.5 font-mono text-xs whitespace-nowrap">
-                      {shortcut.display ?? formatHotkey(shortcut.hotkey)}
+                      {formatHotkey(shortcut.hotkey)}
                     </kbd>
                   </li>
                 ))}

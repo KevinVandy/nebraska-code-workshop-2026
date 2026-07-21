@@ -1,0 +1,24 @@
+<LibraryOverviewSlide library="db">
+
+- Reactive client store extending TanStack Query — collections, live queries, optimistic mutations
+- Collections: typed sets of objects, populated via Query, sync engines, or localStorage
+- Sub-millisecond live queries with filtering, sorting, joins
+- Optimistic mutations apply instantly, auto-rollback on server failure
+- Kills endpoint sprawl — normalized collections mean fewer view-specific APIs
+
+```tsx
+import { createCollection, eq, useLiveQuery } from "@tanstack/react-db"
+
+const todos = createCollection({
+  /* opts */
+})
+
+function Todos() {
+  const { data } = useLiveQuery((q) =>
+    q.from({ t: todos }).where(({ t }) => eq(t.done, false))
+  )
+  return data.map((t) => <li>{t.text}</li>)
+}
+```
+
+</LibraryOverviewSlide>

@@ -9,7 +9,6 @@ import { ShortcutsDialog } from "./shortcuts-dialog"
 
 interface ShortcutsContextValue {
   openPalette: () => void
-  openCheatSheet: () => void
 }
 
 const ShortcutsContext = React.createContext<ShortcutsContextValue | null>(null)
@@ -99,10 +98,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   )
 
   const value = React.useMemo(
-    () => ({
-      openPalette: () => setPaletteOpen(true),
-      openCheatSheet: () => setCheatSheetOpen(true),
-    }),
+    () => ({ openPalette: () => setPaletteOpen(true) }),
     []
   )
 

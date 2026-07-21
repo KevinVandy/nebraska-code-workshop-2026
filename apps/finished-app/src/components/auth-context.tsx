@@ -6,10 +6,9 @@ import type { User } from "@workspace/types"
 import {
   clearClientSession,
   setClientSession,
-  sessionFromUser
-  
+  sessionFromUser,
 } from "@/lib/auth"
-import type {Session} from "@/lib/auth";
+import type { Session } from "@/lib/auth"
 
 /* The session is read isomorphically in the root route's `beforeLoad` (from
  * the request cookie on the server, document.cookie in the browser) and handed

@@ -1,0 +1,22 @@
+<LibraryOverviewSlide library="ai">
+
+- Type-safe, provider-agnostic AI SDK — one `chat()` API, swappable adapters (OpenAI, Anthropic, Gemini, Ollama…)
+- Streaming built in, SSE responses out of the box
+- Isomorphic tools: define once with Zod schemas, implement `.server()` or `.client()`
+- `useChat` hook handles messages, streaming state, and tool approval
+- Tree-shakeable adapters keep bundles small
+
+```tsx
+import { useChat, fetchServerSentEvents } from "@tanstack/ai-react"
+
+function Chat() {
+  const { messages, sendMessage } = useChat({
+    connection: fetchServerSentEvents("/api/chat"),
+  })
+  return messages.map((m) =>
+    m.parts.map((p) => (p.type === "text" ? p.content : null))
+  )
+}
+```
+
+</LibraryOverviewSlide>
