@@ -130,6 +130,6 @@ you know why.
 
 ## Not in this checkpoint
 
-The dashboard tables are hand-written HTML (TanStack Table is next), the
-Contact page has no form, searches fire per keystroke, there are no keyboard
-shortcuts, and Casper's panel is empty.
+The dashboard tables are hand-written HTML (TanStack Table is next) and the
+Contact page has no form. The command palette and Casper aren't built yet —
+they arrive with the Hotkeys and AI checkpoints.

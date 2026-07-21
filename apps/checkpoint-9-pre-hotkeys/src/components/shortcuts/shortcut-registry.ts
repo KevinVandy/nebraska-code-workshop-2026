@@ -16,7 +16,6 @@ export interface ShortcutDef {
 
 export const SHORTCUTS: ShortcutDef[] = [
   { hotkey: "Mod+K", label: "Open command palette", group: "Actions" },
-  { hotkey: "Mod+J", label: "Toggle Casper (AI assistant)", group: "Actions" },
   // Note: TanStack Hotkeys deliberately disallows Shift+punctuation (layout
   // dependent — Shift+/ is "?" only on some keyboards), so the cheat-sheet uses
   // the Slack-style Mod+/ instead of "?".

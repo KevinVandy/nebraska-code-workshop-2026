@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router"
 import { useHotkey } from "@tanstack/react-hotkeys"
 
 import { useAuth } from "../auth-context"
-import { useCasper } from "../casper/casper-context"
 import { CommandPalette } from "./command-palette"
 import { ShortcutsDialog } from "./shortcuts-dialog"
 
@@ -29,7 +28,6 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [cheatSheetOpen, setCheatSheetOpen] = React.useState(false)
   const { session } = useAuth()
-  const { toggle: toggleCasper } = useCasper()
   const navigate = useNavigate()
 
   const enabled = Boolean(session)
@@ -43,14 +41,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
     { enabled }
   )
 
-  useHotkey(
-    "Mod+J",
-    (e) => {
-      e.preventDefault()
-      toggleCasper()
-    },
-    { enabled }
-  )
+  // TODO — register Mod+J to toggle Casper with useCasper's `toggle`, gated { enabled }.
 
   useHotkey(
     "Mod+/",

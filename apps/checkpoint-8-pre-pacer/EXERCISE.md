@@ -1,7 +1,7 @@
 # Checkpoint: TanStack Pacer
 
-Two search boxes in this app fire a request on **every keystroke**. Fix both
-with TanStack Pacer.
+The Book tab's search box fires a request on **every keystroke**. Fix it with
+TanStack Pacer.
 
 **Answer key:** `apps/checkpoint-9-pre-hotkeys` — but try it yourself first.
 
@@ -28,12 +28,11 @@ That's what you're fixing.
 | # | File | What you'll build |
 |---|------|-------------------|
 | 1 | `src/routes/_app/dashboard/book.tsx` | `useDebouncedCallback` — split instant typing from the debounced URL write |
-| 2 | `src/components/shortcuts/command-palette.tsx` | `useDebouncer` — same idea, but you need `.cancel()` |
-| 3 | `src/components/devtools.tsx` | Add the Pacer devtools plugin (one line) |
+| 2 | `src/components/devtools.tsx` | Add the Pacer devtools plugin (one line) |
 
-The shape both share: **keep the cheap thing instant, debounce the expensive
-thing.** Local state updates on every keystroke so the input never feels laggy;
-only the part that triggers a network request gets debounced.
+The shape: **keep the cheap thing instant, debounce the expensive thing.**
+Local state updates on every keystroke so the input never feels laggy; only the
+part that triggers a network request gets debounced.
 
 **Exercise 1, step by step:**
 
@@ -43,23 +42,25 @@ only the part that triggers a network request gets debounced.
    `const commitSearch = useDebouncedCallback((v) => setFilter("q", v), { wait: 400 })`
 3. The input's `onChange` calls **both** — `setSearchText` (instant) and
    `commitSearch` (debounced).
-4. Now the second half: `?q=` can also change from *outside* the input (back
-   button, the palette). Sync `searchText` from `filters.q` in an effect — but
+4. Now the second half: `?q=` can also change from *outside* the input (the
+   back button, a shared link). Sync `searchText` from `filters.q` in an effect — but
    **skip the sync while the input is focused**, or it clobbers keystrokes that
    landed during the 400ms gap. Try it without the guard first and type fast.
 
-## Two hooks, two jobs
+## There's a second hook you'll meet next
 
-- **`useDebouncedCallback`** returns a debounced *function*. Use it when all
-  you need is "call this later."
-- **`useDebouncer`** returns the debouncer *object* — `.maybeExecute(value)` to
-  schedule, `.cancel()` to drop anything pending. Exercise 2 needs `.cancel()`,
-  and there's a real bug if you skip it: type in the palette, hit Escape within
-  300ms, reopen — the stale timer fires and shows phantom results under an
-  empty input. Reproduce it before you fix it.
+`useDebouncedCallback` returns a debounced *function* — "call this later," which
+is all the Book search needs. Pacer also has **`useDebouncer`**, which returns
+the debouncer *object*: `.maybeExecute(value)` to schedule, plus `.cancel()` to
+drop anything already pending.
+
+You'll see `useDebouncer` in the next checkpoint's command palette, which uses
+`.cancel()` to kill a keystroke that was debounced just before the palette
+closed — without it, that stale timer fires after reopening and shows phantom
+results under an empty input. No need to build it here; just know the two hooks
+exist and why the object form earns its keep.
 
 ## Not in this checkpoint
 
-- No keyboard shortcuts yet — open the palette with the header's **Search**
-  button. (TanStack Hotkeys is the next checkpoint.)
-- Casper's panel opens but is empty; the AI assistant comes later.
+The command palette and Casper aren't built yet — they arrive with the Hotkeys
+and AI checkpoints.

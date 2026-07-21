@@ -57,7 +57,9 @@ the **Demo login** button.
 Every checkpoint has an **`EXERCISE.md`** in its folder. Read that first — it
 explains what's missing, how to see the problem before you fix it, and what to
 try once it works. The code itself has numbered `TODO` comments matching the
-exercise.
+exercise. A checkpoint sometimes ships brand-new scaffolding for the feature
+you're about to build (a component, a provider) — when it does, it's listed
+under **New in this checkpoint** so nothing appears by magic.
 
 Ports are fixed per checkpoint, so you can leave several running at once —
 handy for diffing your work against the answer key side by side.

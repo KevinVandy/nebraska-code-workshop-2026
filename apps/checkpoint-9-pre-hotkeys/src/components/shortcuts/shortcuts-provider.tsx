@@ -25,8 +25,8 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 
   /* EXERCISE — TanStack Hotkeys (shortcut table + details in EXERCISE.md)
    *
-   * TODO 1 — register the seven global hotkeys with useHotkey, gated { enabled }.
-   * TODO 2 — wire up what they need: useAuth, useCasper, useNavigate.
+   * TODO 1 — register the six global hotkeys with useHotkey, gated { enabled }.
+   * TODO 2 — wire up what they need: useAuth, useNavigate.
    * TODO 3 — add hotkeysDevtoolsPlugin() in devtools.tsx.
    */
 

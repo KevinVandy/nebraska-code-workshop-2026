@@ -14,12 +14,27 @@ pnpm --filter checkpoint-10-pre-ai dev    # this app on :5560
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`), then
-press `⌘J` / `Ctrl+J` to open Casper. Right now the drawer opens but does
-nothing — that's what you're fixing.
+open Casper from the header's **Ask Casper** button. Right now the drawer opens
+but does nothing — that's what you're fixing.
+
+## New in this checkpoint
+
+The `src/components/casper/` folder is scaffolding you didn't build:
+
+- **`casper-context.tsx`** — the provider and `useCasper()` hook that hold the
+  drawer's open state.
+- **`casper-drawer.tsx`** — the drawer shell plus all the presentational
+  components (flight cards, booking confirmations, trip lists, the approval
+  prompt). The chat wiring is yours.
+- The header's **Ask Casper** button and the command palette's **Ask Casper**
+  row are wired to open the drawer.
+- The cheat-sheet already lists a `Mod+J` shortcut — but it isn't registered
+  yet. That's one more hotkey to wire (TODO in `shortcuts-provider.tsx`), a
+  callback to the Hotkeys checkpoint.
 
 ## The exercises
 
-Work through the `TODO` comments in these four files, in order:
+Work through the `TODO` comments in these files, in order:
 
 | # | File | What you'll build |
 |---|------|-------------------|
@@ -27,6 +42,7 @@ Work through the `TODO` comments in these four files, in order:
 | 2 | `src/routes/api.chat.ts` | Server route: tool implementations + streaming |
 | 3 | `src/components/casper/casper-drawer.tsx` | `useChat`, the client tool, query invalidation |
 | 4 | `src/components/casper/casper-drawer.tsx` | Generative UI: render tool calls as components |
+| 5 | `src/components/shortcuts/shortcuts-provider.tsx` | Wire `Mod+J` to toggle Casper — one more `useHotkey`, calling back to checkpoint 9 |
 
 Each file marks what's **GIVEN** (scaffolding, styling, helpers) and what's
 yours. The presentational components — flight cards, booking confirmations,

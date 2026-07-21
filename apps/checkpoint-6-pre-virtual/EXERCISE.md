@@ -64,7 +64,6 @@ a list that just reordered.
 ## Not in this checkpoint
 
 - The Contact page has no form yet (TanStack Form is the next checkpoint).
-- The Book search and command palette fire a request per keystroke — Pacer
-  fixes that later.
-- No keyboard shortcuts; the palette opens from the header's **Search** button.
-- Casper's panel opens but is empty.
+- The Book search fires a request per keystroke — Pacer fixes that later.
+- The command palette and Casper aren't built yet — they arrive with the
+  Hotkeys and AI checkpoints.

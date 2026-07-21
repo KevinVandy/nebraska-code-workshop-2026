@@ -13,7 +13,6 @@ import {
 import { Input } from "@workspace/ui/components/input"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { useCasper } from "../casper/casper-context"
 import { API_URL } from "@/lib/api"
 import { formatHotkey } from "./shortcut-registry"
 
@@ -50,7 +49,6 @@ export function CommandPalette({
   onShowShortcuts: () => void
 }) {
   const navigate = useNavigate()
-  const { setOpen: setCasperOpen } = useCasper()
   const [text, setText] = React.useState("")
   const [query, setQuery] = React.useState("")
 
@@ -104,13 +102,6 @@ export function CommandPalette({
       hint: formatHotkey("Mod+P"),
       icon: <User className="size-4" />,
       run: () => navigate({ to: "/profile" }),
-    },
-    {
-      id: "casper",
-      label: "Ask Casper",
-      hint: formatHotkey("Mod+J"),
-      icon: <Search className="size-4" />,
-      run: () => setCasperOpen(true),
     },
     {
       id: "shortcuts",

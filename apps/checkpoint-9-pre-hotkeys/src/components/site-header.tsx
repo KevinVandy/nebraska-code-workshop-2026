@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { Ghost, LogOut, Search } from "lucide-react"
+import { LogOut, Search } from "lucide-react"
 
 import {
   Avatar,
@@ -12,7 +12,6 @@ import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Logo } from "./logo"
 import { ThemeToggle } from "./theme-toggle"
 import { useAuth } from "./auth-context"
-import { useCasper } from "./casper/casper-context"
 import { useShortcuts } from "./shortcuts/shortcuts-provider"
 import { formatHotkey } from "./shortcuts/shortcut-registry"
 import { currentUserQuery } from "@/lib/api"
@@ -37,7 +36,6 @@ function initialsOf(name: string) {
 
 export function SiteHeader() {
   const { session, signOut } = useAuth()
-  const { toggle } = useCasper()
   const { openPalette } = useShortcuts()
   const navigate = useNavigate()
   const user = useQuery(currentUserQuery(session?.userId))
@@ -84,10 +82,6 @@ export function SiteHeader() {
                   {formatHotkey("Mod+K")}
                 </kbd>
               </button>
-              <Button variant="outline" size="sm" onClick={toggle}>
-                <Ghost className="text-brand" />
-                Ask Casper
-              </Button>
               <ThemeToggle />
               {/* The avatar is the link to the profile page. */}
               <Link to="/profile" aria-label="Your profile" title={name}>

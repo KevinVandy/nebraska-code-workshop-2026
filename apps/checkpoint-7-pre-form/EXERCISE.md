@@ -67,8 +67,7 @@ imports. Follow the same style rather than extracting shared helpers.
 
 ## Not in this checkpoint
 
-- The Book search and the command palette fire a request per keystroke. That
-  gets fixed with TanStack Pacer in the next checkpoint.
-- No keyboard shortcuts yet — the palette opens from the header's **Search**
-  button.
-- Casper's panel opens but is empty; the AI assistant comes later.
+- The Book search fires a request per keystroke. That gets fixed with TanStack
+  Pacer in the next checkpoint.
+- The command palette and Casper aren't built yet — they arrive with the
+  Hotkeys and AI checkpoints.

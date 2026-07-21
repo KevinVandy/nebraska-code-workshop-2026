@@ -62,5 +62,6 @@ client-side sorting would sort one page. It sets `manualSorting: true`, keeps
 - The Book table paginates with Previous/Next; infinite scroll and
   virtualization come next.
 - The Contact page has no form yet.
-- Search boxes fire a request per keystroke; no keyboard shortcuts; Casper's
-  panel is empty. All of that comes later.
+- The Book search fires a request per keystroke; Pacer fixes that later. The
+  command palette and Casper aren't built yet — they arrive with the Hotkeys
+  and AI checkpoints.

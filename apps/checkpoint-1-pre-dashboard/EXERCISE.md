@@ -83,7 +83,6 @@ literally does not exist in the type system:
 | `components/site-header.tsx` | The Dashboard nav link |
 | `components/footer.tsx` | "Manage booking" → `/dashboard` |
 | `components/flight-search-form.tsx` | Hero search → Book, with search params |
-| `components/shortcuts/command-palette.tsx` | Three nav commands + flight rows |
 | `routes/_marketing/login.tsx`, `signup.tsx` | Redirect signed-in users to `/dashboard` |
 
 ## The point of all this
@@ -106,5 +105,6 @@ the time the code ships.
 ## Not in this checkpoint
 
 Everything is fetched with hand-rolled `useState` + `useEffect` (TanStack Query
-is checkpoint 2), it's a client-only SPA, the Contact page has no form, and
-Casper's panel is empty.
+is checkpoint 2), it's a client-only SPA, and the Contact page has no form. The
+command palette and Casper aren't built yet — they're scaffolded later, in the
+Hotkeys and AI checkpoints.

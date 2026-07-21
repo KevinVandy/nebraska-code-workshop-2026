@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { Ghost, LogOut, Search } from "lucide-react"
+import { LogOut } from "lucide-react"
 
 import type { User } from "@workspace/types"
 import {
@@ -13,8 +13,6 @@ import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Logo } from "./logo"
 import { ThemeToggle } from "./theme-toggle"
 import { useAuth } from "./auth-context"
-import { useCasper } from "./casper/casper-context"
-import { useShortcuts } from "./shortcuts/shortcuts-provider"
 import { fetchUser } from "@/lib/api"
 import { portraitUrl } from "@/lib/images"
 
@@ -37,8 +35,6 @@ function initialsOf(name: string) {
 
 export function SiteHeader() {
   const { session, signOut } = useAuth()
-  const { toggle } = useCasper()
-  const { openPalette } = useShortcuts()
   const navigate = useNavigate()
   /* The signed-in user, fetched here — and again in the profile page, and
    * again on the dashboard overview. Three components, three requests for the
@@ -86,18 +82,6 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {session ? (
             <>
-              <button
-                type="button"
-                onClick={openPalette}
-                className="hidden h-9 items-center gap-2 rounded-lg border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:text-foreground sm:flex"
-              >
-                <Search className="size-4" />
-                <span>Search</span>
-              </button>
-              <Button variant="outline" size="sm" onClick={toggle}>
-                <Ghost className="text-brand" />
-                Ask Casper
-              </Button>
               <ThemeToggle />
               {/* The avatar is the link to the profile page. */}
               <Link to="/profile" aria-label="Your profile" title={name}>

@@ -61,7 +61,6 @@ app. Suggested order:
 | `routes/_app/dashboard/book.tsx` | airports, flights page, price history |
 | `components/booking/booking-dialog.tsx` | cheapest flight + the book mutation |
 | `components/deal-card.tsx` | per-card fare lookup |
-| `components/shortcuts/command-palette.tsx` | live search |
 | `components/flight-search-form.tsx` | airports |
 
 For the mutations, pair `useMutation` with invalidation:
@@ -73,7 +72,7 @@ const cancel = useMutation({
 })
 ```
 
-You don't have to convert all eight components to move on — do the status
+You don't have to convert all seven components to move on — do the status
 board, the overview (including the cancel mutation), and one more. The next
 checkpoint has the rest done.
 
@@ -86,12 +85,12 @@ checkpoint has the rest done.
   counter-bumping in the current cancel flow: invalidation reaches *every*
   observer of that key, not just the component that did the mutation.
 - **The `ignore` flags all go away.** Query cancels superseded requests for
-  you — the race in the command palette's search stops being your problem.
+  you — the races in your hand-rolled fetches stop being your problem.
 - **`refetchInterval: 10_000`** replaces the entire polling effect.
 - **You stop deriving `isPending` from `data === null && error === null`.**
 
 ## Not in this checkpoint
 
 This is still a client-only SPA (Start comes later), the dashboard tables are
-hand-written HTML, the Contact page has no form, searches fire per keystroke,
-there are no keyboard shortcuts, and Casper's panel is empty.
+hand-written HTML, and the Contact page has no form. The command palette and
+Casper aren't built yet — they arrive with the Hotkeys and AI checkpoints.
