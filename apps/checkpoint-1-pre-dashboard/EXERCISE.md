@@ -85,6 +85,37 @@ literally does not exist in the type system:
 | `components/flight-search-form.tsx` | Hero search → Book, with search params |
 | `routes/_marketing/login.tsx`, `signup.tsx` | Redirect signed-in users to `/dashboard` |
 
+### 5. Store the hero search in the URL
+
+The home page's search form keeps `from` / `to` / `date` in three `useState`
+calls — which means a half-filled search is gone on reload and impossible to
+share. Search the codebase for `TODO 5` and move that state into the URL.
+
+Same pattern as step 3, marketing side:
+
+1. Give the index route (`routes/_marketing/index.tsx`) a `validateSearch`
+   schema with optional `from`, `to`, and `date` strings.
+2. In `components/flight-search-form.tsx`, delete the `useState` calls. Read
+   with `useSearch({ from: "/_marketing/" })`; write with a small helper that
+   merges one field into the URL:
+
+   ```tsx
+   const setField = (key: "from" | "to" | "date", value: string) => {
+     navigate({
+       to: ".",
+       search: (prev) => ({ ...prev, [key]: value || undefined }),
+       replace: true,
+     })
+   }
+   ```
+
+   The functional `search` updater merges instead of clobbering the other
+   fields; `|| undefined` removes a cleared field from the URL entirely; and
+   `replace: true` keeps each keystroke from becoming a history entry.
+3. The submit handler now forwards `search.from` / `search.to` / `search.date`
+   straight into the Book tab's search params — URL state flowing into URL
+   state.
+
 ## The point of all this
 
 **Try to break it, and watch TypeScript stop you:**
@@ -97,6 +128,10 @@ literally does not exist in the type system:
   Rejected: `foo` isn't in the schema. Try `from: 123`. Rejected: wrong type.
 - Rename `book.tsx` to `flights.tsx` and watch every reference to
   `/dashboard/book` light up red at once.
+- After step 5, fill in the hero search, **copy the URL, and paste it into a
+  new tab** — the form is already filled out. Reload — still filled out.
+  `useState` can't do either. That's the case for URL state: if it should
+  survive a refresh or travel in a link, it belongs in the URL.
 
 That's the difference between a router that knows your routes and one that
 takes strings on faith. Nothing here is runtime validation — it's all gone by

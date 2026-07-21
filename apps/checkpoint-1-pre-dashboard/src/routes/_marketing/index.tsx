@@ -12,6 +12,7 @@ import { photoUrl } from "@/lib/images"
 import { destinations, featuredDeals, valueProps } from "@/lib/placeholder"
 
 export const Route = createFileRoute("/_marketing/")({
+  // TODO 5 — validate from/to/date search params here with zod (validateSearch).
   component: HomePage,
 })
 

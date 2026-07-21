@@ -28,6 +28,7 @@ export function FlightSearchForm() {
       ignore = true
     }
   }, [])
+  // TODO 5 — replace this local state with the index route's search params.
   const [from, setFrom] = React.useState("SLM")
   const [to, setTo] = React.useState("")
   const [date, setDate] = React.useState("")

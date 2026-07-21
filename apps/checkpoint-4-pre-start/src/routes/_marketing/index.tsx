@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
+import { z } from "zod"
 
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
@@ -11,7 +12,16 @@ import { Photo } from "@/components/photo"
 import { photoUrl } from "@/lib/images"
 import { destinations, featuredDeals, valueProps } from "@/lib/placeholder"
 
+// The hero search form's state lives in the URL, so a search is shareable:
+// /?from=SLM&to=TSY&date=… lands with the form already filled out.
+const homeSearchSchema = z.object({
+  from: z.string().optional(),
+  to: z.string().optional(),
+  date: z.string().optional(),
+})
+
 export const Route = createFileRoute("/_marketing/")({
+  validateSearch: homeSearchSchema,
   component: HomePage,
 })
 
