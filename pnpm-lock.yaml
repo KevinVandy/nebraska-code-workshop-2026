@@ -612,6 +612,9 @@ importers:
       '@tanstack/react-table':
         specifier: 9.0.0-beta.55
         version: 9.0.0-beta.55(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/react-virtual':
+        specifier: ^3.14.6
+        version: 3.14.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tanstack/router-plugin':
         specifier: latest
         version: 1.168.23(@tanstack/react-router@1.170.18(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(vite@8.0.16(@types/node@22.19.19)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.9.0))
