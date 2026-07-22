@@ -1,5 +1,9 @@
+import { Suspense } from "react"
 import { Link, createFileRoute } from "@tanstack/react-router"
+import { useSuspenseQuery } from "@tanstack/react-query"
 import { z } from "zod"
+
+import { Loader2 } from "lucide-react"
 
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
@@ -10,7 +14,8 @@ import { DealCard } from "@/components/deal-card"
 import { FlightSearchForm } from "@/components/flight-search-form"
 import { Photo } from "@/components/photo"
 import { photoUrl } from "@/lib/images"
-import { destinations, featuredDeals, valueProps } from "@/lib/placeholder"
+import { airportsQuery, dealsQuery } from "@/lib/api"
+import { destinations, valueProps } from "@/lib/placeholder"
 
 // The hero search form's state lives in the URL, so a search is shareable:
 // /?from=SLM&to=TSY&date=… lands with the form already filled out.
@@ -22,6 +27,15 @@ const homeSearchSchema = z.object({
 
 export const Route = createFileRoute("/_marketing/")({
   validateSearch: homeSearchSchema,
+  // Fetch the deals ON THE SERVER before rendering: ensureQueryData fills the
+  // QueryClient in router context, the markup renders with data, and the
+  // cache is dehydrated into the HTML — so the same useQuery below never
+  // shows a loading state on first paint. View source: the deals are there.
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(dealsQuery),
+      context.queryClient.ensureQueryData(airportsQuery),
+    ]),
   component: HomePage,
 })
 
@@ -51,11 +65,15 @@ function HomePage() {
         <p className="mt-1 text-muted-foreground">
           Fares this good tend to disappear.
         </p>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredDeals.map((deal) => (
-            <DealCard key={deal.route} {...deal} />
-          ))}
-        </div>
+        <Suspense
+          fallback={
+            <div className="mt-6 flex h-40 items-center justify-center">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          }
+        >
+          <FeaturedDeals />
+        </Suspense>
       </section>
 
       {/* Value props */}
@@ -116,6 +134,30 @@ function HomePage() {
           ))}
         </div>
       </section>
+    </div>
+  )
+}
+
+/* Reads both queries with useSuspenseQuery: while they load, this component
+ * suspends and the Suspense fallback spinner renders instead. On the server
+ * the route loader has already filled the cache, so SSR never suspends. */
+function FeaturedDeals() {
+  const deals = useSuspenseQuery(dealsQuery)
+  const airports = useSuspenseQuery(airportsQuery)
+  const cityOf = (code: string) =>
+    airports.data.find((a) => a.code === code)?.city ?? code
+
+  return (
+    <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {deals.data.map((flight) => (
+        <DealCard
+          key={flight.id}
+          route={`${flight.originCode} → ${flight.destinationCode}`}
+          city={cityOf(flight.destinationCode)}
+          code={flight.destinationCode}
+          price={flight.price}
+        />
+      ))}
     </div>
   )
 }

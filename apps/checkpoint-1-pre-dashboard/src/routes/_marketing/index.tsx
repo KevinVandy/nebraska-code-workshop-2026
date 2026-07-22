@@ -1,4 +1,8 @@
+import * as React from "react"
 import { Link, createFileRoute } from "@tanstack/react-router"
+
+import type { Airport, Flight } from "@workspace/types"
+import { Loader2 } from "lucide-react"
 
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
@@ -9,7 +13,8 @@ import { DealCard } from "@/components/deal-card"
 import { FlightSearchForm } from "@/components/flight-search-form"
 import { Photo } from "@/components/photo"
 import { photoUrl } from "@/lib/images"
-import { destinations, featuredDeals, valueProps } from "@/lib/placeholder"
+import { fetchAirports, fetchDeals } from "@/lib/api"
+import { destinations, valueProps } from "@/lib/placeholder"
 
 export const Route = createFileRoute("/_marketing/")({
   // TODO 5 — validate from/to/date search params here with zod (validateSearch).
@@ -19,6 +24,28 @@ export const Route = createFileRoute("/_marketing/")({
 function HomePage() {
   const { session } = useAuth()
   const { openBooking } = useBooking()
+
+  /* Live featured deals — the cheapest fare on each of four routes, fetched
+   * by hand. Note this is ANOTHER copy of the fetch-in-an-effect pattern. */
+  // `null` means "still loading" — one more piece of state to hand-roll.
+  const [deals, setDeals] = React.useState<Flight[] | null>(null)
+  const [airports, setAirports] = React.useState<Airport[]>([])
+  React.useEffect(() => {
+    let ignore = false
+    Promise.all([fetchDeals(), fetchAirports()])
+      .then(([dealsData, airportsData]) => {
+        if (!ignore) {
+          setDeals(dealsData)
+          setAirports(airportsData)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      ignore = true
+    }
+  }, [])
+  const cityOf = (code: string) =>
+    airports.find((a) => a.code === code)?.city ?? code
 
   return (
     <div className="container mx-auto px-4">
@@ -42,11 +69,23 @@ function HomePage() {
         <p className="mt-1 text-muted-foreground">
           Fares this good tend to disappear.
         </p>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredDeals.map((deal) => (
-            <DealCard key={deal.route} {...deal} />
-          ))}
-        </div>
+        {deals === null ? (
+          <div className="mt-6 flex h-40 items-center justify-center">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {deals.map((flight) => (
+              <DealCard
+                key={flight.id}
+                route={`${flight.originCode} → ${flight.destinationCode}`}
+                city={cityOf(flight.destinationCode)}
+                code={flight.destinationCode}
+                price={flight.price}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Value props */}

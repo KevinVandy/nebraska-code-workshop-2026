@@ -1,6 +1,8 @@
-import { useState } from "react"
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import {
+  HeadContent,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router"
 import { TanStackDevtools } from "@tanstack/react-devtools"
 import { aiDevtoolsPlugin } from "@tanstack/react-ai-devtools"
 import { formDevtoolsPlugin } from "@tanstack/react-form-devtools"
@@ -9,6 +11,8 @@ import { pacerDevtoolsPlugin } from "@tanstack/react-pacer-devtools"
 import { hotkeysDevtoolsPlugin } from "@tanstack/react-hotkeys-devtools"
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+
+import type { QueryClient } from "@tanstack/react-query"
 
 import appCss from "@workspace/ui/globals.css?url"
 
@@ -19,7 +23,11 @@ import { CasperDrawer } from "@/components/casper/casper-drawer"
 import { ShortcutsProvider } from "@/components/shortcuts/shortcuts-provider"
 import { readSession } from "@/lib/auth"
 
-export const Route = createRootRoute({
+// The router context every route can rely on: the QueryClient comes from
+// getRouter() (src/router.tsx), so route loaders can ensureQueryData.
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+}>()({
   // Read the session cookie on every navigation — on the server for the
   // initial document request, in the browser after that — and expose it to
   // every route via router context. Child routes guard on `context.session`.
@@ -56,59 +64,46 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   // first client render agree (no signed-out flash, no hydration mismatch).
   const { session } = Route.useRouteContext()
 
-  // A fresh client per render tree: once on the client, per-request on the server.
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 30_000,
-            refetchOnWindowFocus: false,
-          },
-        },
-      })
-  )
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
+      {/* The QueryClientProvider is supplied by setupRouterSsrQueryIntegration
+          in src/router.tsx, wrapping everything here. */}
       <body>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider initialSession={session}>
-            <BookingProvider>
-              <CasperProvider>
-                <ShortcutsProvider>
-                  {children}
-                  <CasperDrawer />
-                </ShortcutsProvider>
-              </CasperProvider>
-            </BookingProvider>
-          </AuthProvider>
-          {/* One devtools shell for every TanStack library in the app. */}
-          <TanStackDevtools
-            config={{ hideUntilHover: true }}
-            plugins={[
-              {
-                id: "tanstack-query",
-                name: "TanStack Query",
-                render: <ReactQueryDevtoolsPanel />,
-              },
-              {
-                id: "tanstack-router",
-                name: "TanStack Router",
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              tableDevtoolsPlugin(),
-              formDevtoolsPlugin(),
-              aiDevtoolsPlugin(),
-              pacerDevtoolsPlugin(),
-              hotkeysDevtoolsPlugin(),
-            ]}
-          />
-        </QueryClientProvider>
+        <AuthProvider initialSession={session}>
+          <BookingProvider>
+            <CasperProvider>
+              <ShortcutsProvider>
+                {children}
+                <CasperDrawer />
+              </ShortcutsProvider>
+            </CasperProvider>
+          </BookingProvider>
+        </AuthProvider>
+        {/* One devtools shell for every TanStack library in the app. */}
+        <TanStackDevtools
+          config={{ hideUntilHover: true }}
+          plugins={[
+            {
+              id: "tanstack-query",
+              name: "TanStack Query",
+              render: <ReactQueryDevtoolsPanel />,
+            },
+            {
+              id: "tanstack-router",
+              name: "TanStack Router",
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            tableDevtoolsPlugin(),
+            formDevtoolsPlugin(),
+            aiDevtoolsPlugin(),
+            pacerDevtoolsPlugin(),
+            hotkeysDevtoolsPlugin(),
+          ]}
+        />
         <Scripts />
       </body>
     </html>

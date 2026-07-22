@@ -1,5 +1,8 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
 import { z } from "zod"
+
+import { Loader2 } from "lucide-react"
 
 import { Button, buttonVariants } from "@workspace/ui/components/button"
 import { Card } from "@workspace/ui/components/card"
@@ -10,7 +13,8 @@ import { DealCard } from "@/components/deal-card"
 import { FlightSearchForm } from "@/components/flight-search-form"
 import { Photo } from "@/components/photo"
 import { photoUrl } from "@/lib/images"
-import { destinations, featuredDeals, valueProps } from "@/lib/placeholder"
+import { airportsQuery, dealsQuery } from "@/lib/api"
+import { destinations, valueProps } from "@/lib/placeholder"
 
 // The hero search form's state lives in the URL, so a search is shareable:
 // /?from=SLM&to=TSY&date=… lands with the form already filled out.
@@ -22,12 +26,20 @@ const homeSearchSchema = z.object({
 
 export const Route = createFileRoute("/_marketing/")({
   validateSearch: homeSearchSchema,
+  // TODO 4 — ensureQueryData both home queries in a loader so the deals render
+  // on the server (and land in the prerendered HTML).
   component: HomePage,
 })
 
 function HomePage() {
   const { session } = useAuth()
   const { openBooking } = useBooking()
+
+  // Live featured deals — the cheapest fare on each of four routes.
+  const deals = useQuery(dealsQuery)
+  const airports = useQuery(airportsQuery)
+  const cityOf = (code: string) =>
+    airports.data?.find((a) => a.code === code)?.city ?? code
 
   return (
     <div className="container mx-auto px-4">
@@ -51,11 +63,23 @@ function HomePage() {
         <p className="mt-1 text-muted-foreground">
           Fares this good tend to disappear.
         </p>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredDeals.map((deal) => (
-            <DealCard key={deal.route} {...deal} />
-          ))}
-        </div>
+        {deals.isPending ? (
+          <div className="mt-6 flex h-40 items-center justify-center">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {(deals.data ?? []).map((flight) => (
+              <DealCard
+                key={flight.id}
+                route={`${flight.originCode} → ${flight.destinationCode}`}
+                city={cityOf(flight.destinationCode)}
+                code={flight.destinationCode}
+                price={flight.price}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Value props */}

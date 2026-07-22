@@ -33,9 +33,18 @@ Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
 2. Give the authed, per-user pages the `ssr` mode that skips server-rendered
    markup but keeps the server-side guard, in `routes/_app/dashboard.tsx` and
    `routes/_app/profile.tsx`.
+3. Move the QueryClient into router context and wire up the SSR integration
+   from `@tanstack/react-router-ssr-query` (pre-installed), in
+   `src/router.tsx` and `src/routes/__root.tsx`. Follow
+   <https://tanstack.com/router/latest/docs/integrations/query>.
+4. Add a loader to the home route (`routes/_marketing/index.tsx`) that calls
+   `ensureQueryData` for the two featured-deals queries, and switch the deals
+   section to `useSuspenseQuery` inside a `Suspense` boundary, with the
+   spinner as its fallback.
 
-Verify with view-source: the home page's hero is in the HTML, the dashboard's
-tab bar isn't.
+Verify with view-source: the home page's hero AND the featured deals are in
+the HTML (the deals still render through a plain `useQuery`), while the
+dashboard's tab bar isn't.
 
 ## Bonus: React Server Components (experimental)
 

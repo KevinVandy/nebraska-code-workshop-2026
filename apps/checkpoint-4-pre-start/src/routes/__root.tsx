@@ -50,6 +50,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   const { session } = Route.useRouteContext()
 
   // A fresh client per render tree: once on the client, per-request on the server.
+  // TODO 3 — this client moves to router context (createRootRouteWithContext),
+  // so route loaders can reach it.
   const [queryClient] = useState(
     () =>
       new QueryClient({

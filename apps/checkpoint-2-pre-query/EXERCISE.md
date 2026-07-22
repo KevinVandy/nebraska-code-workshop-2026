@@ -25,7 +25,8 @@ Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
 3. Wrap the fetch functions in `queryOptions` in `lib/api.ts`.
 4. Convert the rest: `site-header.tsx`, `profile.tsx`, `dashboard/index.tsx`
    (including the cancel mutation), `dashboard/book.tsx`,
-   `booking-dialog.tsx`, `deal-card.tsx`, and `flight-search-form.tsx`.
+   `booking-dialog.tsx`, `deal-card.tsx`, `flight-search-form.tsx`, and the
+   featured deals on `_marketing/index.tsx`.
 
 You don't need to convert every component to move on. Do the status board,
 the overview, and one more. The answer key has the rest.

@@ -20,6 +20,7 @@
     "@tanstack/react-query-devtools": "^5.101.2",
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-router-ssr-query": "^1.167.1",
     "@tanstack/react-start": "latest",
     "@tanstack/react-table": "9.0.0-beta.55",
     "@tanstack/react-virtual": "^3.14.6",
