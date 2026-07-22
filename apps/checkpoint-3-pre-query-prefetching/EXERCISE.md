@@ -17,9 +17,9 @@ to the Dashboard.
 
 ## The exercise
 
-Prefetch each dashboard tab's queries when its `Link` is hovered or focused,
-in `src/routes/_app/dashboard.tsx`. The queries you need already exist in
-`src/lib/api.ts`.
+Give each tab object in `src/routes/_app/dashboard.tsx` a `prefetch` function
+and call it when the tab's `Link` is hovered or focused. The queries you need
+already exist in `src/lib/api.ts`.
 
 Hover a tab for a beat, then click: instant. Click one cold: a second of
 loading. That's the whole feature.

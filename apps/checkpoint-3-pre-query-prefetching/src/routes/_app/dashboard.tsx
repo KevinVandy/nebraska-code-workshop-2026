@@ -1,10 +1,5 @@
+import { useMemo } from "react"
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router"
-
-const tabs = [
-  { to: "/dashboard", label: "Overview", exact: true },
-  { to: "/dashboard/book", label: "Book a Flight", exact: false },
-  { to: "/dashboard/status", label: "Flight Status", exact: false },
-] as const
 
 // Active styling comes from the router's data-status attribute rather than
 // `activeProps`, so the active colours reliably override the base ones instead
@@ -18,12 +13,23 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 /* EXERCISE — Prefetching
  *
- * TODO 1 — prefetch each tab's queries on hover/focus with queryClient.ensureQueryData.
+ * TODO 1 — give each tab a `prefetch` function (useQueryClient +
+ *          ensureQueryData) and call it from the Link's onMouseEnter/onFocus.
  * TODO 2 — compare ensureQueryData vs prefetchQuery with the Network tab open.
  * TODO 3 — break a query key on purpose and watch the prefetch silently no-op.
  */
 
 function DashboardLayout() {
+  const tabs = useMemo(
+    () =>
+      [
+        { to: "/dashboard", label: "Overview", exact: true },
+        { to: "/dashboard/book", label: "Book a Flight", exact: false },
+        { to: "/dashboard/status", label: "Flight Status", exact: false },
+      ] as const,
+    []
+  )
+
   return (
     <div className="container mx-auto px-4">
       <nav className="flex gap-6 border-b">

@@ -1,10 +1,5 @@
+import { useMemo } from "react"
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router"
-
-const tabs = [
-  { to: "/dashboard", label: "Overview", exact: true },
-  { to: "/dashboard/book", label: "Book a Flight", exact: false },
-  { to: "/dashboard/status", label: "Flight Status", exact: false },
-] as const
 
 // Active styling comes from the router's data-status attribute rather than
 // `activeProps`, so the active colours reliably override the base ones instead
@@ -17,6 +12,16 @@ export const Route = createFileRoute("/_app/dashboard")({
 })
 
 function DashboardLayout() {
+  const tabs = useMemo(
+    () =>
+      [
+        { to: "/dashboard", label: "Overview", exact: true },
+        { to: "/dashboard/book", label: "Book a Flight", exact: false },
+        { to: "/dashboard/status", label: "Flight Status", exact: false },
+      ] as const,
+    []
+  )
+
   return (
     <div className="container mx-auto px-4">
       <nav className="flex gap-6 border-b">

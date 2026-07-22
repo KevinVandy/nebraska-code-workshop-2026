@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router"
 import { useQueryClient } from "@tanstack/react-query"
 
@@ -10,12 +11,6 @@ import {
   flightsPageQuery,
   upcomingTripsQuery,
 } from "@/lib/api"
-
-const tabs = [
-  { to: "/dashboard", label: "Overview", exact: true },
-  { to: "/dashboard/book", label: "Book a Flight", exact: false },
-  { to: "/dashboard/status", label: "Flight Status", exact: false },
-] as const
 
 // Active styling comes from the router's data-status attribute rather than
 // `activeProps`, so the active colours reliably override the base ones instead
@@ -42,24 +37,44 @@ function DashboardLayout() {
    * moment means clicking it renders instantly. `ensureQueryData` is the
    * polite prefetcher — it respects staleTime, so hovering back and forth
    * doesn't re-hit the API while the data is still fresh. */
-  const prefetchTab: Record<(typeof tabs)[number]["to"], () => void> = {
-    "/dashboard": () => {
-      void queryClient.ensureQueryData(currentUserQuery(session.userId))
-      void queryClient.ensureQueryData(upcomingTripsQuery(session.userId))
-      void queryClient.ensureQueryData(allTripsQuery(session.userId))
-      void queryClient.ensureQueryData(dealsQuery)
-    },
-    "/dashboard/book": () => {
-      void queryClient.ensureQueryData(airportsQuery)
-      // First page of the unfiltered, unsorted table — the state the tab
-      // opens in, so the key matches what the Book route will ask for.
-      void queryClient.ensureQueryData(flightsPageQuery(0, [], {}))
-    },
-    "/dashboard/status": () => {
-      void queryClient.ensureQueryData(airportsQuery)
-      void queryClient.ensureQueryData(flightStatusQuery)
-    },
-  }
+  const tabs = useMemo(
+    () =>
+      [
+        {
+          to: "/dashboard",
+          label: "Overview",
+          exact: true,
+          prefetch: () => {
+            void queryClient.ensureQueryData(currentUserQuery(session.userId))
+            void queryClient.ensureQueryData(upcomingTripsQuery(session.userId))
+            void queryClient.ensureQueryData(allTripsQuery(session.userId))
+            void queryClient.ensureQueryData(dealsQuery)
+          },
+        },
+        {
+          to: "/dashboard/book",
+          label: "Book a Flight",
+          exact: false,
+          prefetch: () => {
+            void queryClient.ensureQueryData(airportsQuery)
+            // First page of the unfiltered, unsorted table — the state the
+            // tab opens in, so the key matches what the Book route will ask
+            // for.
+            void queryClient.ensureQueryData(flightsPageQuery(0, [], {}))
+          },
+        },
+        {
+          to: "/dashboard/status",
+          label: "Flight Status",
+          exact: false,
+          prefetch: () => {
+            void queryClient.ensureQueryData(airportsQuery)
+            void queryClient.ensureQueryData(flightStatusQuery)
+          },
+        },
+      ] as const,
+    [queryClient, session.userId]
+  )
 
   return (
     <div className="container mx-auto px-4">
@@ -70,8 +85,8 @@ function DashboardLayout() {
             to={tab.to}
             activeOptions={{ exact: tab.exact }}
             className={tabClass}
-            onMouseEnter={prefetchTab[tab.to]}
-            onFocus={prefetchTab[tab.to]}
+            onMouseEnter={tab.prefetch}
+            onFocus={tab.prefetch}
           >
             {tab.label}
           </Link>
