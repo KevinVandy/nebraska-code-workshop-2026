@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardLayout,
 })
 
-/* EXERCISE — Prefetching (full walkthrough in EXERCISE.md)
+/* EXERCISE — Prefetching
  *
  * TODO 1 — prefetch each tab's queries on hover/focus with queryClient.ensureQueryData.
  * TODO 2 — compare ensureQueryData vs prefetchQuery with the Network tab open.

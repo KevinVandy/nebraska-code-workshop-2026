@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { API_URL } from "@/lib/api"
 import { HQ_MAP_EMBED } from "@/lib/images"
 
-/* EXERCISE — TanStack Form. Build the contact form (details in EXERCISE.md).
+/* EXERCISE — TanStack Form. Build the contact form.
  * Three finished forms in this app are your reference: login.tsx (simplest),
  * signup.tsx (async validation), profile.tsx (query-seeded values). */
 
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_marketing/contact")({
   component: ContactPage,
 })
 
-// TODO 1 — define contactSchema (zod) matching ContactValues; rules in EXERCISE.md.
+// TODO 1 — define contactSchema (zod) matching ContactValues, with helpful messages.
 
 // TODO 2 — add a small FieldError component (copy the pattern from login.tsx).
 

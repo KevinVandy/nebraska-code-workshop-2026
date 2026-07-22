@@ -55,11 +55,11 @@ the **Demo login** button.
 | `pnpm dev:finished` | `finished-app` | *(everything, finished)* | http://localhost:5561 |
 
 Every checkpoint has an **`EXERCISE.md`** in its folder. Read that first — it
-explains what's missing, how to see the problem before you fix it, and what to
-try once it works. The code itself has numbered `TODO` comments matching the
-exercise. A checkpoint sometimes ships brand-new scaffolding for the feature
-you're about to build (a component, a provider) — when it does, it's listed
-under **New in this checkpoint** so nothing appears by magic.
+tells you what to build and where, and the code has numbered `TODO` comments
+to match. The *how* is yours (and the answer key's). A checkpoint sometimes
+ships brand-new scaffolding for the feature you're about to build (a
+component, a provider) — when it does, it's listed under **New in this
+checkpoint** so nothing appears by magic.
 
 Ports are fixed per checkpoint, so you can leave several running at once —
 handy for diffing your work against the answer key side by side.

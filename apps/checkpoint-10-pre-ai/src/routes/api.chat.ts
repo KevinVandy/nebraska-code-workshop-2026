@@ -3,8 +3,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { sessionFromCookieHeader } from "@/lib/auth"
 
 /* EXERCISE 2 of 4 — the chat server route: run the model with your tools and
- * stream the result back as SSE. Endpoints, guards, and the recipe are in
- * EXERCISE.md. GIVEN: session check, env guard, apiJson. */
+ * stream the result back as SSE. GIVEN: session check, env guard, apiJson. */
 
 // The API the tools talk to (json-server). Server-side, so read process.env.
 const API_URL = process.env.VITE_API_URL ?? "http://localhost:3300"

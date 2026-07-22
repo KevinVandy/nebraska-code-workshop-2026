@@ -18,7 +18,7 @@ import {
 import { StatusBadge } from "@/components/status-badge"
 import { airportsQuery, flightStatusQuery } from "@/lib/api"
 
-/* EXERCISE 1 of 3 — TanStack Table. Start here (details in EXERCISE.md).
+/* EXERCISE 1 of 3 — TanStack Table. Start here.
  *
  * TODO 1a — declare this table's feature set with tableFeatures().
  * TODO 1b — define typed columns with createColumnHelper.

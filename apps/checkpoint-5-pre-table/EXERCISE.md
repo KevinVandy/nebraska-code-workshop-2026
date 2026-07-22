@@ -1,67 +1,31 @@
-# Checkpoint: TanStack Table
+# Checkpoint 5: TanStack Table
 
-The dashboard has three tables. All three are hand-written HTML — hardcoded
-`<th>`s, a `.map()` of rows, no sorting. Convert them to TanStack Table v9.
+The dashboard has three hand-written HTML tables — hardcoded headers, a
+`.map()` of rows, no sorting. Convert them to TanStack Table v9, in order:
+each one adds one new idea.
 
-**Answer key:** `apps/checkpoint-6-pre-virtual` — but try it yourself first.
+**Answer key:** `apps/checkpoint-6-pre-virtual`
 
 ## Setup
 
 ```bash
-pnpm dev:server                            # json-server on :3300 (repo root)
-pnpm --filter checkpoint-5-pre-table dev     # this app on :5555
+pnpm dev:server   # json-server on :3300 (repo root)
+pnpm dev:5        # this app on :5555
 ```
 
 Log in with the **Demo login** button (`jd@example.com` / `Test1234`).
 
-## The exercises — do them in this order
+## The exercises
 
-Each table adds one new idea. Don't skip ahead; the third one only makes sense
-after the first two.
+1. Convert the Flight Status table — features, typed columns, `useTable`,
+   `FlexRender`, client-side sorting — in `routes/_app/dashboard/status.tsx`,
+   and register it with the devtools (`components/devtools.tsx`).
+2. Add row selection and a bulk-cancel action to the Overview trips table,
+   reaching the mutation through typed table meta
+   (`routes/_app/dashboard/index.tsx`).
+3. Convert the Book table with **server-side** sorting — it only holds one
+   page of 420 flights, so the API has to sort, not the browser
+   (`routes/_app/dashboard/book.tsx`).
 
-| # | File | New idea |
-|---|------|----------|
-| 1 | `dashboard/status.tsx` | The basics: features, columns, `useTable`, `FlexRender`, client-side sorting |
-| 2 | `dashboard/index.tsx` | Row selection, and how cells reach a mutation (`tableMeta`) |
-| 3 | `dashboard/book.tsx` | Server-side sorting (`manualSorting`) |
-
-The TODOs in each file walk through it. Everything else on these pages — the
-queries, the filters, the charts, the pagination — is already built.
-
-## The three ideas, briefly
-
-**v9 is opt-in.** A table only gets the features you register in
-`tableFeatures({ ... })`. Only the Overview table needs row selection, so only
-that one registers `rowSelectionFeature`. Declare the feature set per route,
-right next to the table that uses it.
-
-**Column definitions must not close over per-render values.** They're module-level
-and memoised. When a cell needs something live — the cancel mutation, the
-booking dialog opener — the answer is **table meta**: declare its type with the
-`tableMeta` slot, pass values via `useTable({ meta })`, read them in the cell
-via `table.options.meta`. Typed, and no stale closures.
-
-**Sorting can happen in two places.** Status and Overview sort in the browser
-(`sortedRowModel`). Book *can't* — it only holds 50 of 420 flights, so
-client-side sorting would sort one page. It sets `manualSorting: true`, keeps
-`sorting` in the query key, and lets json-server do the work.
-
-## Things to try
-
-- **Sort the Book table with `manualSorting: false`** and compare the results
-  against the real cheapest flights. You'll be sorting 50 rows, not 420.
-- **Drop `getRowId`** from the Overview table, select some rows, then sort.
-  Selection follows the wrong trips, because keys fall back to row indices.
-- **Skip the `indeterminate` ref** on the select-all checkbox and check one
-  row. The header checkbox looks unchecked, not partial.
-- **Open the devtools panel → Table tab** after TODO 1e and watch column and
-  sorting state as you click headers.
-
-## Not in this checkpoint
-
-- The Book table paginates with Previous/Next; infinite scroll and
-  virtualization come next.
-- The Contact page has no form yet.
-- The Book search fires a request per keystroke; Pacer fixes that later. The
-  command palette and Casper aren't built yet — they arrive with the Hotkeys
-  and AI checkpoints.
+Follow the `TODO` markers in each file. Everything else on these pages —
+queries, filters, charts, pagination — is already built.

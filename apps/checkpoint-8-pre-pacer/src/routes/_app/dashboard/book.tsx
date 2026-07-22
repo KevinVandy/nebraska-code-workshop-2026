@@ -115,8 +115,7 @@ function BookPage() {
   }
 
   /* TODO 1 — debounce the Search box with useDebouncedCallback: typing stays
-   * instant in local state, the URL write (→ refetch) waits 400ms. Steps and
-   * the two gotchas are in EXERCISE.md. */
+   * instant in local state, only the URL write (→ refetch) is debounced. */
 
   const { openBooking } = useBooking()
 

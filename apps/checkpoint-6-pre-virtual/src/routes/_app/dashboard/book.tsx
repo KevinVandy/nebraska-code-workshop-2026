@@ -170,7 +170,7 @@ function BookPage() {
     []
   )
 
-  /* EXERCISE — two steps, in order (walkthrough in EXERCISE.md):
+  /* EXERCISE — two steps, in order:
    * TODO 1 — convert this paged query to useInfiniteQuery (touches lib/api.ts
    *          and the hover prefetch in dashboard.tsx) and fetch on scroll.
    * TODO 2 — virtualize the rows with useVirtualizer (markup becomes grid/flex).

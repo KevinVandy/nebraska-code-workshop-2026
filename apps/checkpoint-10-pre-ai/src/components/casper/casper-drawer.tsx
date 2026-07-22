@@ -173,7 +173,7 @@ export function CasperDrawer() {
   )
 }
 
-/* EXERCISE 4 — generative UI (part-to-component mapping in EXERCISE.md).
+/* EXERCISE 4 — generative UI.
  *
  * TODO 4 — write the Message component: text parts become chat bubbles, and
  * each tool-call part renders one of the GIVEN components below.

@@ -58,7 +58,7 @@ async function cancelTrip(tripId: number) {
   if (!res.ok) throw new Error(`Failed to cancel trip ${tripId}`)
 }
 
-/* EXERCISE 2 of 3 — row selection. Do status.tsx first (details in EXERCISE.md).
+/* EXERCISE 2 of 3 — row selection. Do status.tsx first.
  *
  * TODO 2a — feature set: same as status.tsx plus rowSelectionFeature.
  * TODO 2b — add a checkbox display column (header checkbox needs `indeterminate`).

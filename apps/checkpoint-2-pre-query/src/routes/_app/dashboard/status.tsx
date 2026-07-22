@@ -21,7 +21,7 @@ import {
 import { StatusBadge } from "@/components/status-badge"
 import { fetchAirports, fetchFlightStatusBoard } from "@/lib/api"
 
-/* EXERCISE — TanStack Query (full walkthrough in EXERCISE.md)
+/* EXERCISE — TanStack Query
  *
  * TODO 1 — replace this file's hand-rolled fetching with two useQuery calls.
  * TODO 2 — define shared queryOptions in src/lib/api.ts (airports get a long staleTime).

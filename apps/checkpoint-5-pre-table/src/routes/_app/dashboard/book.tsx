@@ -44,7 +44,7 @@ function priceHistoryQuery(from?: string, to?: string) {
   })
 }
 
-/* EXERCISE 3 of 3 — server-side sorting (details in EXERCISE.md).
+/* EXERCISE 3 of 3 — server-side sorting.
  *
  * TODO 3a — feature set: sizing + sorting, NO sortedRowModel (the API sorts).
  * TODO 3b — columns, incl. a Book display column that uses table meta.

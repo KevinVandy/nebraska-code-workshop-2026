@@ -23,7 +23,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
   const [paletteOpen, setPaletteOpen] = React.useState(false)
   const [cheatSheetOpen, setCheatSheetOpen] = React.useState(false)
 
-  /* EXERCISE — TanStack Hotkeys (shortcut table + details in EXERCISE.md)
+  /* EXERCISE — TanStack Hotkeys (the cheat-sheet dialog lists all six)
    *
    * TODO 1 — register the six global hotkeys with useHotkey, gated { enabled }.
    * TODO 2 — wire up what they need: useAuth, useNavigate.
