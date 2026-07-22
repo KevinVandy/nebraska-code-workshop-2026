@@ -8,167 +8,167 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as AppRouteImport } from "./routes/_app"
-import { Route as MarketingRouteImport } from "./routes/_marketing"
-import { Route as AppDashboardRouteImport } from "./routes/_app/dashboard"
-import { Route as AppProfileRouteImport } from "./routes/_app/profile"
-import { Route as MarketingIndexRouteImport } from "./routes/_marketing/index"
-import { Route as MarketingAboutRouteImport } from "./routes/_marketing/about"
-import { Route as MarketingContactRouteImport } from "./routes/_marketing/contact"
-import { Route as MarketingLoginRouteImport } from "./routes/_marketing/login"
-import { Route as MarketingSignupRouteImport } from "./routes/_marketing/signup"
-import { Route as ApiChatRouteImport } from "./routes/api.chat"
-import { Route as AppDashboardIndexRouteImport } from "./routes/_app/dashboard/index"
-import { Route as AppDashboardBookRouteImport } from "./routes/_app/dashboard/book"
-import { Route as AppDashboardStatusRouteImport } from "./routes/_app/dashboard/status"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as MarketingRouteImport } from './routes/_marketing'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
+import { Route as MarketingAboutRouteImport } from './routes/_marketing/about'
+import { Route as MarketingContactRouteImport } from './routes/_marketing/contact'
+import { Route as MarketingLoginRouteImport } from './routes/_marketing/login'
+import { Route as MarketingSignupRouteImport } from './routes/_marketing/signup'
+import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AppDashboardIndexRouteImport } from './routes/_app/dashboard/index'
+import { Route as AppDashboardBookRouteImport } from './routes/_app/dashboard/book'
+import { Route as AppDashboardStatusRouteImport } from './routes/_app/dashboard/status'
 
 const AppRoute = AppRouteImport.update({
-  id: "/_app",
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketingRoute = MarketingRouteImport.update({
-  id: "/_marketing",
+  id: '/_marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
-  id: "/profile",
-  path: "/profile",
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
 const MarketingIndexRoute = MarketingIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingAboutRoute = MarketingAboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingContactRoute = MarketingContactRouteImport.update({
-  id: "/contact",
-  path: "/contact",
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingLoginRoute = MarketingLoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => MarketingRoute,
 } as any)
 const MarketingSignupRoute = MarketingSignupRouteImport.update({
-  id: "/signup",
-  path: "/signup",
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => MarketingRoute,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
-  id: "/api/chat",
-  path: "/api/chat",
+  id: '/api/chat',
+  path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppDashboardIndexRoute = AppDashboardIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => AppDashboardRoute,
 } as any)
 const AppDashboardBookRoute = AppDashboardBookRouteImport.update({
-  id: "/book",
-  path: "/book",
+  id: '/book',
+  path: '/book',
   getParentRoute: () => AppDashboardRoute,
 } as any)
 const AppDashboardStatusRoute = AppDashboardStatusRouteImport.update({
-  id: "/status",
-  path: "/status",
+  id: '/status',
+  path: '/status',
   getParentRoute: () => AppDashboardRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof MarketingIndexRoute
-  "/dashboard": typeof AppDashboardRouteWithChildren
-  "/profile": typeof AppProfileRoute
-  "/about": typeof MarketingAboutRoute
-  "/contact": typeof MarketingContactRoute
-  "/login": typeof MarketingLoginRoute
-  "/signup": typeof MarketingSignupRoute
-  "/api/chat": typeof ApiChatRoute
-  "/dashboard/book": typeof AppDashboardBookRoute
-  "/dashboard/status": typeof AppDashboardStatusRoute
-  "/dashboard/": typeof AppDashboardIndexRoute
+  '/': typeof MarketingIndexRoute
+  '/dashboard': typeof AppDashboardRouteWithChildren
+  '/profile': typeof AppProfileRoute
+  '/about': typeof MarketingAboutRoute
+  '/contact': typeof MarketingContactRoute
+  '/login': typeof MarketingLoginRoute
+  '/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
+  '/dashboard/book': typeof AppDashboardBookRoute
+  '/dashboard/status': typeof AppDashboardStatusRoute
+  '/dashboard/': typeof AppDashboardIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof MarketingIndexRoute
-  "/profile": typeof AppProfileRoute
-  "/about": typeof MarketingAboutRoute
-  "/contact": typeof MarketingContactRoute
-  "/login": typeof MarketingLoginRoute
-  "/signup": typeof MarketingSignupRoute
-  "/api/chat": typeof ApiChatRoute
-  "/dashboard/book": typeof AppDashboardBookRoute
-  "/dashboard/status": typeof AppDashboardStatusRoute
-  "/dashboard": typeof AppDashboardIndexRoute
+  '/': typeof MarketingIndexRoute
+  '/profile': typeof AppProfileRoute
+  '/about': typeof MarketingAboutRoute
+  '/contact': typeof MarketingContactRoute
+  '/login': typeof MarketingLoginRoute
+  '/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
+  '/dashboard/book': typeof AppDashboardBookRoute
+  '/dashboard/status': typeof AppDashboardStatusRoute
+  '/dashboard': typeof AppDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/_app": typeof AppRouteWithChildren
-  "/_marketing": typeof MarketingRouteWithChildren
-  "/_app/dashboard": typeof AppDashboardRouteWithChildren
-  "/_app/profile": typeof AppProfileRoute
-  "/_marketing/about": typeof MarketingAboutRoute
-  "/_marketing/contact": typeof MarketingContactRoute
-  "/_marketing/login": typeof MarketingLoginRoute
-  "/_marketing/signup": typeof MarketingSignupRoute
-  "/api/chat": typeof ApiChatRoute
-  "/_marketing/": typeof MarketingIndexRoute
-  "/_app/dashboard/book": typeof AppDashboardBookRoute
-  "/_app/dashboard/status": typeof AppDashboardStatusRoute
-  "/_app/dashboard/": typeof AppDashboardIndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_marketing': typeof MarketingRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRouteWithChildren
+  '/_app/profile': typeof AppProfileRoute
+  '/_marketing/about': typeof MarketingAboutRoute
+  '/_marketing/contact': typeof MarketingContactRoute
+  '/_marketing/login': typeof MarketingLoginRoute
+  '/_marketing/signup': typeof MarketingSignupRoute
+  '/api/chat': typeof ApiChatRoute
+  '/_marketing/': typeof MarketingIndexRoute
+  '/_app/dashboard/book': typeof AppDashboardBookRoute
+  '/_app/dashboard/status': typeof AppDashboardStatusRoute
+  '/_app/dashboard/': typeof AppDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/dashboard"
-    | "/profile"
-    | "/about"
-    | "/contact"
-    | "/login"
-    | "/signup"
-    | "/api/chat"
-    | "/dashboard/book"
-    | "/dashboard/status"
-    | "/dashboard/"
+    | '/'
+    | '/dashboard'
+    | '/profile'
+    | '/about'
+    | '/contact'
+    | '/login'
+    | '/signup'
+    | '/api/chat'
+    | '/dashboard/book'
+    | '/dashboard/status'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/profile"
-    | "/about"
-    | "/contact"
-    | "/login"
-    | "/signup"
-    | "/api/chat"
-    | "/dashboard/book"
-    | "/dashboard/status"
-    | "/dashboard"
+    | '/'
+    | '/profile'
+    | '/about'
+    | '/contact'
+    | '/login'
+    | '/signup'
+    | '/api/chat'
+    | '/dashboard/book'
+    | '/dashboard/status'
+    | '/dashboard'
   id:
-    | "__root__"
-    | "/_app"
-    | "/_marketing"
-    | "/_app/dashboard"
-    | "/_app/profile"
-    | "/_marketing/about"
-    | "/_marketing/contact"
-    | "/_marketing/login"
-    | "/_marketing/signup"
-    | "/api/chat"
-    | "/_marketing/"
-    | "/_app/dashboard/book"
-    | "/_app/dashboard/status"
-    | "/_app/dashboard/"
+    | '__root__'
+    | '/_app'
+    | '/_marketing'
+    | '/_app/dashboard'
+    | '/_app/profile'
+    | '/_marketing/about'
+    | '/_marketing/contact'
+    | '/_marketing/login'
+    | '/_marketing/signup'
+    | '/api/chat'
+    | '/_marketing/'
+    | '/_app/dashboard/book'
+    | '/_app/dashboard/status'
+    | '/_app/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,96 +177,96 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/_app": {
-      id: "/_app"
-      path: ""
-      fullPath: "/"
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/_marketing": {
-      id: "/_marketing"
-      path: ""
-      fullPath: "/"
+    '/_marketing': {
+      id: '/_marketing'
+      path: ''
+      fullPath: '/'
       preLoaderRoute: typeof MarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/_app/dashboard": {
-      id: "/_app/dashboard"
-      path: "/dashboard"
-      fullPath: "/dashboard"
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
-    "/_app/profile": {
-      id: "/_app/profile"
-      path: "/profile"
-      fullPath: "/profile"
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
-    "/_marketing/": {
-      id: "/_marketing/"
-      path: "/"
-      fullPath: "/"
+    '/_marketing/': {
+      id: '/_marketing/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof MarketingIndexRouteImport
       parentRoute: typeof MarketingRoute
     }
-    "/_marketing/about": {
-      id: "/_marketing/about"
-      path: "/about"
-      fullPath: "/about"
+    '/_marketing/about': {
+      id: '/_marketing/about'
+      path: '/about'
+      fullPath: '/about'
       preLoaderRoute: typeof MarketingAboutRouteImport
       parentRoute: typeof MarketingRoute
     }
-    "/_marketing/contact": {
-      id: "/_marketing/contact"
-      path: "/contact"
-      fullPath: "/contact"
+    '/_marketing/contact': {
+      id: '/_marketing/contact'
+      path: '/contact'
+      fullPath: '/contact'
       preLoaderRoute: typeof MarketingContactRouteImport
       parentRoute: typeof MarketingRoute
     }
-    "/_marketing/login": {
-      id: "/_marketing/login"
-      path: "/login"
-      fullPath: "/login"
+    '/_marketing/login': {
+      id: '/_marketing/login'
+      path: '/login'
+      fullPath: '/login'
       preLoaderRoute: typeof MarketingLoginRouteImport
       parentRoute: typeof MarketingRoute
     }
-    "/_marketing/signup": {
-      id: "/_marketing/signup"
-      path: "/signup"
-      fullPath: "/signup"
+    '/_marketing/signup': {
+      id: '/_marketing/signup'
+      path: '/signup'
+      fullPath: '/signup'
       preLoaderRoute: typeof MarketingSignupRouteImport
       parentRoute: typeof MarketingRoute
     }
-    "/api/chat": {
-      id: "/api/chat"
-      path: "/api/chat"
-      fullPath: "/api/chat"
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/_app/dashboard/": {
-      id: "/_app/dashboard/"
-      path: "/"
-      fullPath: "/dashboard/"
+    '/_app/dashboard/': {
+      id: '/_app/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
       preLoaderRoute: typeof AppDashboardIndexRouteImport
       parentRoute: typeof AppDashboardRoute
     }
-    "/_app/dashboard/book": {
-      id: "/_app/dashboard/book"
-      path: "/book"
-      fullPath: "/dashboard/book"
+    '/_app/dashboard/book': {
+      id: '/_app/dashboard/book'
+      path: '/book'
+      fullPath: '/dashboard/book'
       preLoaderRoute: typeof AppDashboardBookRouteImport
       parentRoute: typeof AppDashboardRoute
     }
-    "/_app/dashboard/status": {
-      id: "/_app/dashboard/status"
-      path: "/status"
-      fullPath: "/dashboard/status"
+    '/_app/dashboard/status': {
+      id: '/_app/dashboard/status'
+      path: '/status'
+      fullPath: '/dashboard/status'
       preLoaderRoute: typeof AppDashboardStatusRouteImport
       parentRoute: typeof AppDashboardRoute
     }
@@ -286,7 +286,7 @@ const AppDashboardRouteChildren: AppDashboardRouteChildren = {
 }
 
 const AppDashboardRouteWithChildren = AppDashboardRoute._addFileChildren(
-  AppDashboardRouteChildren
+  AppDashboardRouteChildren,
 )
 
 interface AppRouteChildren {
@@ -318,7 +318,7 @@ const MarketingRouteChildren: MarketingRouteChildren = {
 }
 
 const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
-  MarketingRouteChildren
+  MarketingRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -330,9 +330,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx"
-import type { createStart } from "@tanstack/react-start"
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
