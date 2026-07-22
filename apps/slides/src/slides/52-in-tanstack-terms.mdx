@@ -4,28 +4,38 @@
 
 <div>
 
-### TanStack Router
+### Router — CSR SPA
 
-- Best-in-class **CSR SPA**
-- Route loaders with SWR caching
-- Automatic link prefetching
-- Pairs perfectly with TanStack Query
-- Deploy to any static host
+```tsx
+// routes/posts.tsx
+export const Route = createFileRoute("/posts")({
+  // runs in the browser, cached + prefetched
+  loader: () => fetchPosts(),
+  component: Posts,
+})
+```
 
 </div>
 
 <div>
 
-### TanStack Start
+### Start — same route, plus a server
 
-- The **same router** — plus a server
-- Full-document SSR + streaming
-- Server functions: type-safe RPCs
-- API routes alongside your frontend
-- Selective SSR: opt out per route
+```tsx
+// routes/posts.tsx
+const getPosts = createServerFn().handler(
+  () => db.query.posts.findMany() // server only
+)
+
+export const Route = createFileRoute("/posts")({
+  // runs on the server first — SSR'd, streamed
+  loader: () => getPosts(),
+  component: Posts,
+})
+```
 
 </div>
 
 </Columns>
 
-- You don't rewrite — you upgrade. Start with Router, add Start when you need the server.
+- Same router, same loader API — you don't rewrite, you upgrade

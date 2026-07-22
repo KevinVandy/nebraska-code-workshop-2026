@@ -17,12 +17,12 @@ to **Dashboard → Book a Flight**.
 
 ## The exercises
 
-Both in `src/routes/_app/dashboard/book.tsx` — get step 1 working before
+Both in `src/routes/_app/dashboard/book.tsx`. Get step 1 working before
 starting step 2.
 
 1. Switch the flights list to `useInfiniteQuery` (an `infiniteQueryOptions` in
    `lib/api.ts`), loading the next page from scroll position instead of
-   buttons — and update the tab-bar hover prefetch in
+   buttons, and update the tab-bar hover prefetch in
    `routes/_app/dashboard.tsx` to match.
 2. Virtualize the rows with `useVirtualizer` so the DOM only holds what's on
    screen.

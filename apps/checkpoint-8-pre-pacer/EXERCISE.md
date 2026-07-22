@@ -1,6 +1,6 @@
 # Checkpoint 8: TanStack Pacer
 
-The Book tab's search box fires a request on every keystroke — five
+The Book tab's search box fires a request on every keystroke: five
 characters, five navigations, five requests against a 1-second API. Fix it
 with TanStack Pacer.
 
@@ -19,9 +19,9 @@ type into the Book tab's search box with the Network tab open.
 ## The exercises
 
 1. Debounce the search box in `src/routes/_app/dashboard/book.tsx` with
-   `useDebouncedCallback` — typing stays instant in local state, only the URL
+   `useDebouncedCallback`. Typing stays instant in local state; only the URL
    write (and therefore the refetch) waits.
-2. Add the Pacer devtools plugin in `src/components/devtools.tsx`.
+2. Add the Pacer devtools plugin in `src/routes/__root.tsx`.
 
 Pacer's other debounce hook, `useDebouncer`, returns an object with
-`.cancel()` — you'll meet it in the next checkpoint's command palette.
+`.cancel()`. You'll meet it in the next checkpoint's command palette.

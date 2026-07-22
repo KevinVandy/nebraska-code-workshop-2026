@@ -1,6 +1,13 @@
+import { useState } from "react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Outlet, createRootRoute } from "@tanstack/react-router"
+import { TanStackDevtools } from "@tanstack/react-devtools"
+import { formDevtoolsPlugin } from "@tanstack/react-form-devtools"
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 
-import { AppProviders } from "@/components/providers"
+import { AuthProvider } from "@/components/auth-context"
+import { BookingProvider } from "@/components/booking/booking-dialog"
 import { readSession } from "@/lib/auth"
 
 export const Route = createRootRoute({
@@ -22,9 +29,43 @@ function RootComponent() {
   // Seed React auth state from router context.
   const { session } = Route.useRouteContext()
 
+  // A fresh client per render tree: once on the client, per-request on the server.
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 30_000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  )
+
   return (
-    <AppProviders initialSession={session}>
-      <Outlet />
-    </AppProviders>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider initialSession={session}>
+        <BookingProvider>
+          <Outlet />
+        </BookingProvider>
+      </AuthProvider>
+      {/* One devtools shell for every TanStack library in the app. */}
+      <TanStackDevtools
+        config={{ hideUntilHover: true }}
+        plugins={[
+          {
+            id: "tanstack-query",
+            name: "TanStack Query",
+            render: <ReactQueryDevtoolsPanel />,
+          },
+          {
+            id: "tanstack-router",
+            name: "TanStack Router",
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+          formDevtoolsPlugin(),
+        ]}
+      />
+    </QueryClientProvider>
   )
 }

@@ -1,6 +1,6 @@
 # Checkpoint 10: TanStack AI
 
-Everything in Ghost Airlines works except Casper, the AI concierge — the
+Everything in Ghost Airlines works except Casper, the AI concierge. The
 drawer opens and does nothing. Wire him up.
 
 **Answer key:** `apps/finished-app`
@@ -32,13 +32,13 @@ open Casper from the header's **Ask Casper** button.
    approval), and the client-side `applySearchFilters`.
 2. Implement them against json-server and stream the chat in
    `src/routes/api.chat.ts`.
-3. Wire up `useChat` in `src/components/casper/casper-drawer.tsx` — the client
+3. Wire up `useChat` in `src/components/casper/casper-drawer.tsx`. The client
    tool drives the Book tab's search params, and bookings invalidate the right
    queries.
 4. Render tool calls as the given components (generative UI), also in
    `casper-drawer.tsx`.
 5. Register `Mod+J` to toggle Casper in
-   `src/components/shortcuts/shortcuts-provider.tsx` — one last `useHotkey`.
+   `src/components/shortcuts/shortcuts-provider.tsx`, one last `useHotkey`.
 
 Ask Casper whether a cancelled flight is on time, then ask him to book you
 something and deny the approval. If he answers without calling a tool, your

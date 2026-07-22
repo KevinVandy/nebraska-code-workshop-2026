@@ -1,0 +1,37 @@
+## How We Organize Routes in Our Apps
+
+<Columns>
+
+<div>
+
+- Every route renders inside `__root.tsx`
+- Parents wrap children through `<Outlet />`
+- `_app.tsx` / `_marketing.tsx` — **pathless layouts**: wrap and guard routes without adding a URL segment
+- `dashboard.tsx` + `dashboard/` — the **file** is the layout, the **matching folder** holds its children
+- `index.tsx` matches the parent's path exactly; `$param.tsx` would be dynamic
+- `api.chat.ts` — dots nest too; this one's a server route
+
+</div>
+
+```txt
+src/routes/
+├── __root.tsx
+├── _app.tsx           ← auth guard + <Outlet />
+├── _app/
+│   ├── dashboard.tsx  ← tabs + <Outlet />
+│   ├── dashboard/
+│   │   ├── index.tsx  → /dashboard
+│   │   ├── book.tsx   → /dashboard/book
+│   │   └── status.tsx → /dashboard/status
+│   └── profile.tsx    → /profile
+├── _marketing.tsx     ← public layout
+├── _marketing/
+│   ├── index.tsx      → /
+│   ├── about.tsx      → /about
+│   └── login.tsx      → /login
+└── api.chat.ts        → POST /api/chat
+```
+
+</Columns>
+
+- **This is just one way to do it** — flat files with dots, folders, or fully code-based routing all work. Pick a convention and stay consistent.

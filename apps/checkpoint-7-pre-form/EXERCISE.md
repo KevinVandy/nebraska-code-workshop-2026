@@ -21,7 +21,7 @@ All four TODOs are in `src/routes/_marketing/contact.tsx`:
 1. Write the zod validation schema.
 2. Write a small `FieldError` component.
 3. Set up `useForm` plus a `useMutation` that POSTs the message.
-4. Build the form markup — `form.Field` per input, `form.Subscribe` for the
+4. Build the form markup: `form.Field` per input, `form.Subscribe` for the
    submit button.
 
 The app already contains three finished TanStack Form examples to crib from:

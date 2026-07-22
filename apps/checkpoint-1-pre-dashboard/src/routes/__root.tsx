@@ -1,6 +1,10 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router"
+import { TanStackDevtools } from "@tanstack/react-devtools"
+import { formDevtoolsPlugin } from "@tanstack/react-form-devtools"
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 
-import { AppProviders } from "@/components/providers"
+import { AuthProvider } from "@/components/auth-context"
+import { BookingProvider } from "@/components/booking/booking-dialog"
 import { readSession } from "@/lib/auth"
 
 export const Route = createRootRoute({
@@ -23,8 +27,24 @@ function RootComponent() {
   const { session } = Route.useRouteContext()
 
   return (
-    <AppProviders initialSession={session}>
-      <Outlet />
-    </AppProviders>
+    <>
+      <AuthProvider initialSession={session}>
+        <BookingProvider>
+          <Outlet />
+        </BookingProvider>
+      </AuthProvider>
+      {/* One devtools shell for every TanStack library in the app. */}
+      <TanStackDevtools
+        config={{ hideUntilHover: true }}
+        plugins={[
+          {
+            id: "tanstack-router",
+            name: "TanStack Router",
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+          formDevtoolsPlugin(),
+        ]}
+      />
+    </>
   )
 }
